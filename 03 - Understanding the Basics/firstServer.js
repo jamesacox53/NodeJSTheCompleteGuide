@@ -27,7 +27,37 @@ function sendInputFormPage(response) {
 }
 
 function storeMessageAndReDirect(request, response) {
-  fs.writeFileSync('message.txt', 'DUMMY');
+  const body = [];
+
+  request.on('data', (chunk) => {
+    _addUserText(body, chunk);
+  });
+
+  request.on('end', () => {
+    _workOnCompleteUserText(body);
+  });
+
+  _redirect(response);
+}
+
+function _addUserText(bodyArr, chunk) {
+  bodyArr.push(chunk);
+}
+
+function _workOnCompleteUserText(bodyArr) {
+  const parsedBody = Buffer.concat(bodyArr);
+  const parsedBodyStr = parsedBody.toString();
+
+  const messageStr = parsedBodyStr.split('=')[1];
+
+  _writeMessageToFile(messageStr);
+}
+
+function _writeMessageToFile(messageStr) {
+  fs.writeFileSync('message.txt', messageStr);
+}
+
+function _redirect(response) {
   response.statusCode = 302;
   response.setHeader('Location', '/');
   return response.end();
