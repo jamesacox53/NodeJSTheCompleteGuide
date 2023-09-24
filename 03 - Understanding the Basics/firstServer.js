@@ -9,7 +9,7 @@ function serverListener(request, response) {
     return sendInputFormPage(response);
 
   } else if (url == '/message' && method == 'POST') {
-    return storeMessageAndReDirect(request, response);
+    return storeMessageAndReDirectToInputFormPage(request, response);
 
   } else {
     return sendDefaultPage(response);
@@ -23,10 +23,10 @@ function sendInputFormPage(response) {
   response.write('<body><form action="/message" method="POST"><input type="text" name="messageText"><button type="submit">Send</button></form></body>');
   response.write('</html>');
 
-  return response.end();
+  response.end();
 }
 
-function storeMessageAndReDirect(request, response) {
+function storeMessageAndReDirectToInputFormPage(request, response) {
   const body = [];
 
   request.on('data', (chunk) => {
@@ -34,33 +34,33 @@ function storeMessageAndReDirect(request, response) {
   });
 
   request.on('end', () => {
-    _workOnCompleteUserText(body);
+    _workOnCompleteUserText(body, response);
   });
-
-  _redirect(response);
 }
 
 function _addUserText(bodyArr, chunk) {
   bodyArr.push(chunk);
 }
 
-function _workOnCompleteUserText(bodyArr) {
+function _workOnCompleteUserText(bodyArr, response) {
   const parsedBody = Buffer.concat(bodyArr);
   const parsedBodyStr = parsedBody.toString();
 
   const messageStr = parsedBodyStr.split('=')[1];
 
-  _writeMessageToFile(messageStr);
+  _writeMessageToFileAndRedirect(messageStr, response);
 }
 
-function _writeMessageToFile(messageStr) {
-  fs.writeFileSync('message.txt', messageStr);
+function _writeMessageToFileAndRedirect(messageStr, response) {
+  fs.writeFile('message.txt', messageStr, (err) => {
+    _redirectToInputFormPage(response);
+  });
 }
 
-function _redirect(response) {
+function _redirectToInputFormPage(response) {
   response.statusCode = 302;
   response.setHeader('Location', '/');
-  return response.end();
+  response.end();
 }
 
 function sendDefaultPage(response) {
