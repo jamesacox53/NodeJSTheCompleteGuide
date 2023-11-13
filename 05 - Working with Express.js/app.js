@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 
 const adminRoutes = require('./routes/admin.js');
 const shopRoutes = require('./routes/shop.js');
-const errorRoutes = require('./routes/error.js');
+const error404Routes = require('./routes/error404.js');
 
 const app = express();
 
@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
-app.use(errorRoutes);
+app.use(error404Routes);
 
 const server = http.createServer(app);
 
