@@ -6,7 +6,7 @@ const router = express.Router();
 const rootDirectoryStr = require('../util/rootDirectory');
 
 router.get('/', (request, response, next) => {
-  response.sendFile(path.join(rootDirectoryStr, 'views', 'shop.html'));
+  response.render('shop.pug');
 });
 
 module.exports = router;

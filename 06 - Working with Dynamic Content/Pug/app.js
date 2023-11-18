@@ -7,6 +7,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const app = express();
+app.set('view engine', 'pug');
+app.set('views', 'views');
 
 const rootDirectoryStr = require('./util/rootDirectory.js');
 const adminRoutes = require('./routes/admin.js');
