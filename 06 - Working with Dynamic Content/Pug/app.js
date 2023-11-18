@@ -11,6 +11,7 @@ app.set('view engine', 'pug');
 app.set('views', 'views');
 
 const rootDirectoryStr = require('./util/rootDirectory.js');
+var productsArr = require('./database/productsArr.js');
 const adminRoutes = require('./routes/admin.js');
 const shopRoutes = require('./routes/shop.js');
 const error404Routes = require('./routes/error404.js');

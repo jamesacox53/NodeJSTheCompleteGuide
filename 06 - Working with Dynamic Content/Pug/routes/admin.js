@@ -4,13 +4,20 @@ const express = require('express');
 const router = express.Router();
 
 const rootDirectoryStr = require('../util/rootDirectory.js');
+const productsArr = require('../database/productsArr.js');
 
 router.get('/admin/add-product', (request, response, next) => {
   response.sendFile(path.join(rootDirectoryStr, 'views', 'add-product.html'));
 });
 
 router.post('/admin/add-product', (request, response, next) => {
-  console.log(request.body);
+  var productDetailsObj = {
+    title: request.body.title
+  };
+
+  console.log(productDetailsObj.title);
+
+  productsArr.push(productDetailsObj);
   response.redirect('/');
 });
 
