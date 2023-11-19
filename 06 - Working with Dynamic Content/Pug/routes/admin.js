@@ -7,7 +7,11 @@ const rootDirectoryStr = require('../util/rootDirectory.js');
 const productsArr = require('../database/productsArr.js');
 
 router.get('/admin/add-product', (request, response, next) => {
-  response.sendFile(path.join(rootDirectoryStr, 'views', 'add-product.html'));
+  var optionsObj = {
+    pageTitle: 'Add Product'
+  };
+
+  response.render('add-product.pug', optionsObj);
 });
 
 router.post('/admin/add-product', (request, response, next) => {

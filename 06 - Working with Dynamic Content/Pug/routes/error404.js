@@ -6,8 +6,7 @@ const router = express.Router();
 const rootDirectoryStr = require('../util/rootDirectory');
 
 router.use('/', (request, response, next) => {
-    const error404HTMLFilePath = path.join(rootDirectoryStr, 'views', '404.html');
-    response.status(404).sendFile(error404HTMLFilePath);
+    response.status(404).render('404.pug');
 });
 
 module.exports = router;
