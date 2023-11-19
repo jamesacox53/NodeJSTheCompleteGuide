@@ -6,7 +6,12 @@ const router = express.Router();
 const rootDirectoryStr = require('../util/rootDirectory');
 
 router.use('/', (request, response, next) => {
-    response.status(404).render('404.pug');
+    var optionsObj = {
+        pageTitle: 'Page Not Found',
+        path: ''
+    };
+
+    response.status(404).render('404.pug', optionsObj);
 });
 
 module.exports = router;

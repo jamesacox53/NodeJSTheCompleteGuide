@@ -7,7 +7,13 @@ const rootDirectoryStr = require('../util/rootDirectory');
 const productsArr = require('../database/productsArr.js');
 
 router.get('/', (request, response, next) => {
-  response.render('shop.pug', { prods: productsArr });
+  var optionsObj = {
+    pageTitle: 'Shop',
+    path: '/',
+    prods: productsArr
+  };
+
+  response.render('shop.pug', optionsObj);
 });
 
 module.exports = router;

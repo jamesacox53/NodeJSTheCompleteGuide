@@ -8,7 +8,8 @@ const productsArr = require('../database/productsArr.js');
 
 router.get('/admin/add-product', (request, response, next) => {
   var optionsObj = {
-    pageTitle: 'Add Product'
+    pageTitle: 'Add Product',
+    path: '/admin/add-product'
   };
 
   response.render('add-product.pug', optionsObj);
