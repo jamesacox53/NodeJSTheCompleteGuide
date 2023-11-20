@@ -10,6 +10,7 @@ router.get('/', (request, response, next) => {
   var optionsObj = {
     pageTitle: 'Shop',
     path: '/',
+    hasProds: (productsArr.length > 0),
     prods: productsArr
   };
 
