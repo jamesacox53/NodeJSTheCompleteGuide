@@ -11,7 +11,9 @@ router.get('/', (request, response, next) => {
     pageTitle: 'Shop',
     path: '/',
     hasProds: (productsArr.length > 0),
-    prods: productsArr
+    prods: productsArr,
+    activeShop: true,
+    productCSS: true
   };
 
   response.render('shop.hbs', optionsObj);
