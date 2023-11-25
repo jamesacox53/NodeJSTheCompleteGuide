@@ -9,10 +9,7 @@ const productsArr = require('../database/productsArr.js');
 router.get('/admin/add-product', (request, response, next) => {
   var optionsObj = {
     pageTitle: 'Add Product',
-    path: '/admin/add-product',
-    formsCSS: true,
-    productCSS: true,
-    activeAddProduct: true
+    path: '/admin/add-product'
   };
 
   response.render('add-product.ejs', optionsObj);
