@@ -1,7 +1,7 @@
-const productsArr = require('../database/productsArr.js');
+const Product = require('../models/product.js');
 
 exports.getAddProductPage = (request, response, next) => {
-  var optionsObj = {
+  const optionsObj = {
     pageTitle: 'Add Product',
     path: '/admin/add-product'
   };
@@ -10,18 +10,19 @@ exports.getAddProductPage = (request, response, next) => {
 };
 
 exports.postAddProduct = (request, response, next) => {
-  var productDetailsObj = {
-    title: request.body.title
-  };
+  const productTitleStr = request.body.title;
+  const product = new Product(productTitleStr);
   
-  console.log(productDetailsObj.title);
-  
-  productsArr.push(productDetailsObj);
+  console.log(productTitleStr);
+  product.save();
+
   response.redirect('/');
 };
 
 exports.getProducts = (request, response, next) => {
-  var optionsObj = {
+  const productsArr = Product.fetchAll();
+  
+  const optionsObj = {
     pageTitle: 'Shop',
     path: '/',
     prods: productsArr
