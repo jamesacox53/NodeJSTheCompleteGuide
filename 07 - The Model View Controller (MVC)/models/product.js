@@ -15,9 +15,9 @@ module.exports = class Product {
         });
     }
 
-    static fetchAll() {
+    static fetchAll(callbackFunc) {
         fs.readFile(productsFilePath, (error, fileContent) => {
-            return this._readFileForFetchAll(error, fileContent);
+            return this._readFileForFetchAll(callbackFunc, error, fileContent);
         });
     }
 
@@ -43,10 +43,16 @@ module.exports = class Product {
         console.log(error);
     }
 
-    _readFileForFetchAll(error, fileContent) {
-        if (error) return [];
+    static _readFileForFetchAll(callbackFunc, error, fileContent) {
+        let productsArr;
         
-        const productsArr = JSON.parse(fileContent);
-        return productsArr;
+        if (error) {
+            productsArr = [];
+        
+        } else {
+            productsArr = JSON.parse(fileContent);
+        }
+
+        callbackFunc(productsArr);
     }
 }

@@ -20,13 +20,15 @@ exports.postAddProduct = (request, response, next) => {
 };
 
 exports.getProducts = (request, response, next) => {
-  const productsArr = Product.fetchAll();
+  const callbackFunc = (productsArr) => {
+    const optionsObj = {
+      pageTitle: 'Shop',
+      path: '/',
+      prods: productsArr
+    };
   
-  const optionsObj = {
-    pageTitle: 'Shop',
-    path: '/',
-    prods: productsArr
-  };
+    response.render('shop.ejs', optionsObj);
+  }
 
-  response.render('shop.ejs', optionsObj);
+  Product.fetchAll(callbackFunc);
 };
