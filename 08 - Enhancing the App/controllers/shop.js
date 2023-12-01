@@ -42,6 +42,20 @@ exports.getCart = (request, response, next) => {
   Product.fetchAll(callbackFunc);
 };
 
+exports.getOrders = (request, response, next) => {
+  const callbackFunc = (productsArr) => {
+    const optionsObj = {
+      pageTitle: 'Orders',
+      path: '/orders',
+      prods: productsArr
+    };
+  
+    response.render('shop/orders.ejs', optionsObj);
+  }
+
+  Product.fetchAll(callbackFunc);
+};
+
 exports.getCheckout = (request, response, next) => {
   const callbackFunc = (productsArr) => {
     const optionsObj = {
