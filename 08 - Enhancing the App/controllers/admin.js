@@ -10,8 +10,14 @@ exports.getAddProductPage = (request, response, next) => {
 };
   
 exports.postAddProduct = (request, response, next) => {
-  const productTitleStr = request.body.title;
-  const product = new Product(productTitleStr);
+  const productArgsObj = {
+    productTitleStr: request.body.title,
+    imageURLStr: request.body.imageURL,
+    priceStr: request.body.price,
+    descriptionStr: request.body.description
+  };
+
+  const product = new Product(productArgsObj);
     
   console.log(productTitleStr);
   product.save();
