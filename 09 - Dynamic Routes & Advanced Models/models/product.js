@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const rootDirectoryStr = require(path.join('..', 'util', 'rootDirectory.js'));
+const rootDirectoryStr = path.dirname(require.main.filename);
 const productsFilePath = path.join(rootDirectoryStr, 'data', 'products.json');
 
 module.exports = class Product {
@@ -10,11 +10,12 @@ module.exports = class Product {
         this.imageURL = productArgsObj.imageURLStr;
         this.description = productArgsObj.descriptionStr;
         this.price = productArgsObj.priceStr;
+        this.id = Math.random().toString();
     }
 
     save() {
         fs.readFile(productsFilePath, (error, fileContent) => {
-            return this._readFileForSave(this, error, fileContent);
+            return this._readFileForSave(error, fileContent);
         });
     }
 
@@ -24,7 +25,7 @@ module.exports = class Product {
         });
     }
 
-    _readFileForSave(product, error, fileContent) {
+    _readFileForSave(error, fileContent) {
         let productsArr;
         
         if (error) {
@@ -34,7 +35,7 @@ module.exports = class Product {
             productsArr = JSON.parse(fileContent);
         }
 
-        productsArr.push(product);
+        productsArr.push(this);
 
         var productsArrJSONStr = JSON.stringify(productsArr);
         fs.writeFile(productsFilePath, productsArrJSONStr, this._failedToWriteFileForSave);
