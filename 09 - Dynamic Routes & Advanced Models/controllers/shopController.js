@@ -16,6 +16,12 @@ exports.getProducts = (request, response, next) => {
   Product.fetchAll(callbackFunc);
 };
 
+exports.getProduct = (request, response, next) => {
+  const productID = request.params.productID;
+  console.log(productID);
+  response.redirect('/');
+};
+
 exports.getIndex = (request, response, next) => {
   const callbackFunc = (productsArr) => {
     const optionsObj = {
