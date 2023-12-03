@@ -17,9 +17,19 @@ exports.getProducts = (request, response, next) => {
 };
 
 exports.getProduct = (request, response, next) => {
+  const callbackFunc = (product) => {
+    const optionsObj = {
+      path: path,
+      pageTitle: product.title,
+      pathStr: '/products',
+      product: product
+    };
+
+    response.render(path.join('shop', 'product-detail.ejs'), optionsObj);
+  }
+  
   const productID = request.params.productID;
-  console.log(productID);
-  response.redirect('/');
+  Product.getProductByID(productID, callbackFunc);
 };
 
 exports.getIndex = (request, response, next) => {

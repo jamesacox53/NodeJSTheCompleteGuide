@@ -59,4 +59,21 @@ module.exports = class Product {
 
         callbackFunc(productsArr);
     }
+
+    static getProductByID(id, callbackFunc) {
+        this.fetchAll((productsArr) => {
+            this._getProductByIDFetchAll(id, productsArr, callbackFunc);
+        });
+    }
+
+    static _getProductByIDFetchAll(id, productsArr, callbackFunc) {
+        for (let i = 0; i < productsArr.length; i++) {
+            const product = productsArr[i];
+
+            if (product.id == id) {
+                callbackFunc(product);
+                return;
+            }
+        }
+    }
 }
