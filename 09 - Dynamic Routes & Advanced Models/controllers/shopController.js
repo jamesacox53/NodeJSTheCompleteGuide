@@ -47,6 +47,28 @@ exports.getIndex = (request, response, next) => {
   Product.fetchAll(callbackFunc);
 };
 
+exports.postCart = (request, response, next) => {
+  const productID = request.body.productID;
+  console.log(productID);
+
+  response.redirect('/');
+
+  /*
+  const callbackFunc = (productsArr) => {
+    const optionsObj = {
+      path: path,
+      pageTitle: 'Your Cart',
+      pathStr: '/cart',
+      prods: productsArr
+    };
+  
+    response.render(path.join('shop', 'cart.ejs'), optionsObj);
+  }
+
+  Product.fetchAll(callbackFunc);
+  */
+};
+
 exports.getCart = (request, response, next) => {
   const callbackFunc = (productsArr) => {
     const optionsObj = {
