@@ -1,5 +1,6 @@
 const path = require('path');
 const Product = require(path.join('..', 'models', 'product.js'));
+const Cart = require(path.join('..', 'models', 'cart.js'));
 
 exports.getProducts = (request, response, next) => {
   const callbackFunc = (productsArr) => {
@@ -51,22 +52,11 @@ exports.postCart = (request, response, next) => {
   const productID = request.body.productID;
   console.log(productID);
 
+  Product.getProductByID(productID, (product) => {
+    Cart.addProduct(product);
+  });
+
   response.redirect('/');
-
-  /*
-  const callbackFunc = (productsArr) => {
-    const optionsObj = {
-      path: path,
-      pageTitle: 'Your Cart',
-      pathStr: '/cart',
-      prods: productsArr
-    };
-  
-    response.render(path.join('shop', 'cart.ejs'), optionsObj);
-  }
-
-  Product.fetchAll(callbackFunc);
-  */
 };
 
 exports.getCart = (request, response, next) => {
