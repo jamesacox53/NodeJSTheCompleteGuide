@@ -27,6 +27,22 @@ exports.postAddProduct = (request, response, next) => {
   response.redirect('/');
 };
 
+exports.getEditProductPage = (request, response, next) => {
+  const callbackFunc = (product) => {
+    const optionsObj = {
+      path: path,
+      pageTitle: 'Edit Product',
+      pathStr: '/admin/edit-product',
+      product: product
+    };
+
+    response.render(path.join('admin', 'edit-product.ejs'), optionsObj);
+  };
+
+  const productID = request.params.productID;
+  Product.getProductByID(productID, callbackFunc);
+};
+
 exports.getProducts = (request, response, next) => {
   const callbackFunc = (productsArr) => {
     const optionsObj = {
