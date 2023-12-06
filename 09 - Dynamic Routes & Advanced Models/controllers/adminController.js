@@ -22,9 +22,9 @@ exports.postAddProduct = (request, response, next) => {
   const product = new Product(productArgsObj);
     
   console.log(productArgsObj.productTitleStr);
-  product.save();
-  
-  response.redirect('/');
+  product.save((error) => {
+    response.redirect('/');
+  });
 };
 
 exports.getEditProductPage = (request, response, next) => {
@@ -41,6 +41,25 @@ exports.getEditProductPage = (request, response, next) => {
 
   const productID = request.params.productID;
   Product.getProductByID(productID, callbackFunc);
+};
+
+exports.postEditProduct = (request, response, next) => {
+  const productID = request.body.productID;
+  const productTitleStr = request.body.title;
+  const imageURLStr = request.body.imageURL;
+  const priceStr = request.body.price;
+  const descriptionStr = request.body.description;
+
+  Product.getProductByID(productID, (product) => {
+    product.title = productTitleStr;
+    product.imageURL = imageURLStr;
+    product.description = descriptionStr;
+    product.price = priceStr;
+  
+    product.save((error) => {
+      response.redirect('/admin/products');
+    });
+  });
 };
 
 exports.getProducts = (request, response, next) => {

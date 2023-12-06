@@ -13,9 +13,9 @@ module.exports = class Product {
         this.id = Math.random().toString();
     }
 
-    save() {
+    save(callbackFunc) {
         fs.readFile(productsFilePath, (error, fileContent) => {
-            return this._readFileForSave(error, fileContent);
+            return this._readFileForSave(error, fileContent, callbackFunc);
         });
     }
 
@@ -25,7 +25,7 @@ module.exports = class Product {
         });
     }
 
-    _readFileForSave(error, fileContent) {
+    _readFileForSave(error, fileContent, callbackFunc) {
         let productsArr;
         
         if (error) {
@@ -35,16 +35,23 @@ module.exports = class Product {
             productsArr = JSON.parse(fileContent);
         }
 
-        productsArr.push(this);
+        this._updateProductsArr(productsArr);
 
         var productsArrJSONStr = JSON.stringify(productsArr);
-        fs.writeFile(productsFilePath, productsArrJSONStr, this._failedToWriteFileForSave);
+        fs.writeFile(productsFilePath, productsArrJSONStr, callbackFunc);
     }
 
-    _failedToWriteFileForSave(error) {
-        if (!error) return;
+    _updateProductsArr(productsArr) {
+        for (let i = 0; i < productsArr.length; i++) {
+            const prod = productsArr[i];
 
-        console.log(error);
+            if (prod.id == this.id) {
+                productsArr[i] = this;
+                return;
+            }
+        }
+
+        productsArr.push(this);
     }
 
     static _readFileForFetchAll(callbackFunc, error, fileContent) {
@@ -71,9 +78,25 @@ module.exports = class Product {
             const product = productsArr[i];
 
             if (product.id == id) {
-                callbackFunc(product);
+                const actualProduct = this._createProductFetchAll(product);
+
+                callbackFunc(actualProduct);
                 return;
             }
         }
+    }
+
+    static _createProductFetchAll(product) {
+        const productArgs = {
+            productTitleStr: product.title,
+            imageURLStr: product.imageURL,
+            descriptionStr: product.description,
+            priceStr: product.price
+        };
+
+        const actualProduct = new Product(productArgs);
+        actualProduct.id = product.id;
+        
+        return actualProduct;
     }
 }
