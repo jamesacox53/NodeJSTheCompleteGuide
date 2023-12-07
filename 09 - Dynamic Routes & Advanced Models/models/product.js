@@ -6,11 +6,17 @@ const productsFilePath = path.join(rootDirectoryStr, 'data', 'products.json');
 
 module.exports = class Product {
     constructor(productArgsObj) {
-        this.title = productArgsObj.productTitleStr;
-        this.imageURL = productArgsObj.imageURLStr;
-        this.description = productArgsObj.descriptionStr;
-        this.price = productArgsObj.priceStr;
-        this.id = Math.random().toString();
+        this.title = productArgsObj.title;
+        this.imageURL = productArgsObj.imageURL;
+        this.description = productArgsObj.description;
+        this.price = productArgsObj.price;
+        
+        if (productArgsObj.id) {
+            this.id = productArgsObj.id;
+        
+        } else {
+            this.id = Math.random().toString();
+        }
     }
 
     save(callbackFunc) {
@@ -78,7 +84,7 @@ module.exports = class Product {
             const product = productsArr[i];
 
             if (product.id == id) {
-                const actualProduct = this._createProductFetchAll(product);
+                const actualProduct = new Product(product);
 
                 callbackFunc(actualProduct);
                 return;
@@ -86,17 +92,23 @@ module.exports = class Product {
         }
     }
 
-    static _createProductFetchAll(product) {
-        const productArgs = {
-            productTitleStr: product.title,
-            imageURLStr: product.imageURL,
-            descriptionStr: product.description,
-            priceStr: product.price
-        };
+    static deleteByID(id, callbackFunc) {
+        this.fetchAll((productsArr) => {
+            this._deleteProductByIDFetchAll(id, productsArr, callbackFunc);
+        });
+    }
 
-        const actualProduct = new Product(productArgs);
-        actualProduct.id = product.id;
+    static _deleteProductByIDFetchAll(id, productsArr, callbackFunc) {
+        const newProductsArr = [];
         
-        return actualProduct;
+        for (let i = 0; i < productsArr.length; i++) {
+            const product = productsArr[i];
+
+            if (product.id != id)
+                newProductsArr.push(product);
+        }
+
+        var productsArrJSONStr = JSON.stringify(newProductsArr);
+        fs.writeFile(productsFilePath, productsArrJSONStr, callbackFunc);
     }
 }
