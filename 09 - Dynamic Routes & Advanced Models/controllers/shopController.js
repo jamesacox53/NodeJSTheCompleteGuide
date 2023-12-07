@@ -54,24 +54,58 @@ exports.postCart = (request, response, next) => {
 
   Product.getProductByID(productID, (product) => {
     Cart.addProduct(product, (error) => {
-      response.redirect('/');
+      response.redirect('/cart');
     });
   });
 };
 
 exports.getCart = (request, response, next) => {
-  const callbackFunc = (productsArr) => {
-    const optionsObj = {
-      path: path,
-      pageTitle: 'Your Cart',
-      pathStr: '/cart',
-      prods: productsArr
-    };
-  
-    response.render(path.join('shop', 'cart.ejs'), optionsObj);
+  getCartView(response);
+
+  function getCartView(response) {
+    Cart.fetchCart((cartObj) => {
+      Product.fetchAll((productsArr) => {
+        const cartViewProdsObjArr = _getCartViewProdObjArr(cartObj, productsArr);
+
+        const optionsObj = {
+        path: path,
+        pageTitle: 'Your Cart',
+        pathStr: '/cart',
+        cartViewProdsObjArr: cartViewProdsObjArr
+        };
+      
+        response.render(path.join('shop', 'cart.ejs'), optionsObj);
+      });
+    });
   }
 
-  Product.fetchAll(callbackFunc);
+  function _getCartViewProdObjArr(cartObj, productsArr) {
+    const cartViewProdsObjArr = [];
+    const cartProdsArr = cartObj.productsArr;
+
+    for (let i = 0; i < cartProdsArr.length; i++) {
+      const cartProduct = cartProdsArr[i];
+      const product = _getProductForCartProduct(cartProduct, productsArr);
+      if (!product) continue;
+
+      const cartViewProdObj = {
+        product: product,
+        cartProduct: cartProduct
+      };
+
+      cartViewProdsObjArr.push(cartViewProdObj);
+    }
+
+    return cartViewProdsObjArr;
+  }
+  
+  function _getProductForCartProduct(cartProduct, productsArr) {
+    for (let i = 0; i < productsArr.length; i++) {
+      const product = productsArr[i];
+      if (cartProduct.id == product.id)
+        return product;
+    }
+  }
 };
 
 exports.getOrders = (request, response, next) => {

@@ -3,4 +3,13 @@
 
     <body>
         <%- include(path.join('..', 'includes', 'navigation.ejs')) %>
+        <% if (cartViewProdsObjArr.length > 0) { %>    
+            <ul>
+                <% for (cartViewProdObj of cartViewProdsObjArr) { %>
+                    <li><%= cartViewProdObj.product.title %> (<%= cartViewProdObj.cartProduct.quantity %>)</li>
+                <% } %>    
+            </ul>
+        <% } else { %>
+            <h1>No Products</h1>
+        <% } %>    
         <%- include(path.join('..', 'includes', 'end.ejs')) %>
