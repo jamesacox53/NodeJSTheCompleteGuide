@@ -50,12 +50,19 @@ exports.getIndex = (request, response, next) => {
 
 exports.postCart = (request, response, next) => {
   const productID = request.body.productID;
-  console.log(productID);
 
   Product.getProductByID(productID, (product) => {
     Cart.addProduct(product, (error) => {
       response.redirect('/cart');
     });
+  });
+};
+
+exports.postCartDeleteItem = (request, response, next) => {
+  const productID = request.body.productID;
+
+  Cart.deleteProductByID(productID, (error) => {
+    response.redirect('/cart');
   });
 };
 

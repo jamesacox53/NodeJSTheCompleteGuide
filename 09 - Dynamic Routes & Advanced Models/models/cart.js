@@ -92,7 +92,7 @@ module.exports = class Cart {
     static _createCartObjWithoutProduct(id, cartObj) {
         const productsArr = cartObj.productsArr;
         const newProductsArr = [];
-        const newTotalPrice = 0;
+        let newTotalPrice = 0;
 
         for (let i = 0; i < productsArr.length; i++) {
             const product = productsArr[i];

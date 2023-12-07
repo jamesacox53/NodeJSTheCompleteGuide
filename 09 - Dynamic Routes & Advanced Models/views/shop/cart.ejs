@@ -6,7 +6,13 @@
         <% if (cartViewProdsObjArr.length > 0) { %>    
             <ul>
                 <% for (cartViewProdObj of cartViewProdsObjArr) { %>
-                    <li><%= cartViewProdObj.product.title %> (<%= cartViewProdObj.cartProduct.quantity %>)</li>
+                    <li>
+                        <p><%= cartViewProdObj.product.title %> (<%= cartViewProdObj.cartProduct.quantity %>)</p>
+                        <form action="/cart-delete-item" method="POST">
+                            <input type="hidden" name="productID" value="<%= cartViewProdObj.product.id %>">
+                            <button class="btn" type="submit">Delete</button>
+                        </form>
+                    </li>
                 <% } %>    
             </ul>
         <% } else { %>
