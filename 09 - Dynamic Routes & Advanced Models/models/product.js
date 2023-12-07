@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const rootDirectoryStr = path.dirname(require.main.filename);
+const Cart = require(path.join(rootDirectoryStr, 'models', 'cart.js'));
 const productsFilePath = path.join(rootDirectoryStr, 'data', 'products.json');
 
 module.exports = class Product {
@@ -109,6 +110,8 @@ module.exports = class Product {
         }
 
         var productsArrJSONStr = JSON.stringify(newProductsArr);
-        fs.writeFile(productsFilePath, productsArrJSONStr, callbackFunc);
+        fs.writeFile(productsFilePath, productsArrJSONStr, (error) => {
+            Cart.deleteProductByID(id, callbackFunc);
+        });
     }
 }

@@ -53,10 +53,10 @@ exports.postCart = (request, response, next) => {
   console.log(productID);
 
   Product.getProductByID(productID, (product) => {
-    Cart.addProduct(product);
+    Cart.addProduct(product, (error) => {
+      response.redirect('/');
+    });
   });
-
-  response.redirect('/');
 };
 
 exports.getCart = (request, response, next) => {

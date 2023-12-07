@@ -5,9 +5,9 @@ const rootDirectoryStr = path.dirname(require.main.filename);
 const cartFilePath = path.join(rootDirectoryStr, 'data', 'cart.json');
 
 module.exports = class Cart {
-    static addProduct(product) {
+    static addProduct(product, callbackFunc) {
         this.fetchCart((cartObj) => {
-            this._addProduct(product, cartObj);
+            this._addProduct(product, cartObj, callbackFunc);
         });
     }
 
@@ -32,11 +32,11 @@ module.exports = class Cart {
         callbackFunc(cartObj);
     }
 
-    static _addProduct(product, cartObj) {
+    static _addProduct(product, cartObj, callbackFunc) {
         this._addProductToCart(product, cartObj);
         
         var cartObjJSONStr = JSON.stringify(cartObj);
-        fs.writeFile(cartFilePath, cartObjJSONStr, this._failedToWriteFileForSave);
+        fs.writeFile(cartFilePath, cartObjJSONStr, callbackFunc);
     }
 
     static _addProductToCart(product, cartObj) {
@@ -76,9 +76,38 @@ module.exports = class Cart {
         }
     }
 
-    static _failedToWriteFileForSave(error) {
-        if (!error) return;
+    static deleteProductByID(id, callbackFunc) {
+        this.fetchCart((cartObj) => {
+            this._deleteProductByID(id, cartObj, callbackFunc);
+        });
+    }
 
-        console.log(error);
+    static _deleteProductByID(id, cartObj, callbackFunc) {
+        const newCartObj = this._createCartObjWithoutProduct(id, cartObj);
+
+        var newCartObjJSONStr = JSON.stringify(newCartObj);
+        fs.writeFile(cartFilePath, newCartObjJSONStr, callbackFunc);
+    }
+
+    static _createCartObjWithoutProduct(id, cartObj) {
+        const productsArr = cartObj.productsArr;
+        const newProductsArr = [];
+        const newTotalPrice = 0;
+
+        for (let i = 0; i < productsArr.length; i++) {
+            const product = productsArr[i];
+
+            if (product.id != id) {
+                newProductsArr.push(product);
+                newTotalPrice += product.price;
+            }
+        }
+
+        var newCartObj = {
+            productsArr: newProductsArr,
+            totalPrice: newTotalPrice
+        };
+
+        return newCartObj;
     }
 }
