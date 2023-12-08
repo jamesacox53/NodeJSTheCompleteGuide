@@ -22,56 +22,13 @@ module.exports = class Product {
         }
     }
 
-    save(callbackFunc) {
-        fs.readFile(productsFilePath, (error, fileContent) => {
-            return this._readFileForSave(error, fileContent, callbackFunc);
-        });
+    save() {
+        return database.execute('INSERT INTO products (title, price, imageURL, description) VALUES (?, ?, ?, ?)',
+        [this.title, this.price, this.imageURL, this.description]);
     }
 
     static fetchAll() {
         return database.execute('SELECT * FROM products');
-    }
-
-    _readFileForSave(error, fileContent, callbackFunc) {
-        let productsArr;
-        
-        if (error) {
-            productsArr = [];
-        
-        } else {
-            productsArr = JSON.parse(fileContent);
-        }
-
-        this._updateProductsArr(productsArr);
-
-        var productsArrJSONStr = JSON.stringify(productsArr);
-        fs.writeFile(productsFilePath, productsArrJSONStr, callbackFunc);
-    }
-
-    _updateProductsArr(productsArr) {
-        for (let i = 0; i < productsArr.length; i++) {
-            const prod = productsArr[i];
-
-            if (prod.id == this.id) {
-                productsArr[i] = this;
-                return;
-            }
-        }
-
-        productsArr.push(this);
-    }
-
-    static _readFileForFetchAll(callbackFunc, error, fileContent) {
-        let productsArr;
-        
-        if (error) {
-            productsArr = [];
-        
-        } else {
-            productsArr = JSON.parse(fileContent);
-        }
-
-        callbackFunc(productsArr);
     }
 
     static getProductByID(id, callbackFunc) {

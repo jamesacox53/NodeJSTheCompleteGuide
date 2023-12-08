@@ -12,18 +12,24 @@ exports.getAddProductPage = (request, response, next) => {
 };
   
 exports.postAddProduct = (request, response, next) => {
-  const productArgsObj = {
-    title: request.body.title,
-    imageURL: request.body.imageURL,
-    price: request.body.price,
-    description: request.body.description
-  };
+  _postAddProduct(request, response);
 
-  const product = new Product(productArgsObj);
+  function _postAddProduct(request, response) {
+    const productArgsObj = {
+      title: request.body.title,
+      imageURL: request.body.imageURL,
+      price: request.body.price,
+      description: request.body.description
+    };
+  
+    const product = new Product(productArgsObj);
+  
+    product.save().then(err => _gotoIndexPage(err, response));
+  }
 
-  product.save((error) => {
+  function _gotoIndexPage(err, response) {
     response.redirect('/');
-  });
+  }
 };
 
 exports.getEditProductPage = (request, response, next) => {
@@ -43,22 +49,33 @@ exports.getEditProductPage = (request, response, next) => {
 };
 
 exports.postEditProduct = (request, response, next) => {
-  const productID = request.body.productID;
+  _postEditProduct(request, response);
+
+  function _postEditProduct(request, response) {
+    const productID = request.body.productID;
   
-  Product.getProductByID(productID, (product) => {
-    product.title = request.body.title;
-    product.imageURL = request.body.imageURL;
-    product.description = request.body.description;
-    product.price = request.body.price;
+    Product.getProductByID(productID, (product) => {
+      product.title = request.body.title;
+      product.imageURL = request.body.imageURL;
+      product.description = request.body.description;
+      product.price = request.body.price;
   
-    product.save((error) => {
-      response.redirect('/admin/products');
+      product.save().then(err => _gotoAdminProductPage(err, response));
     });
-  });
+  }
+  
+  function _gotoAdminProductPage(err, response) {
+    response.redirect('/admin/products');
+  }
 };
 
 exports.getProducts = (request, response, next) => {
-  const callbackFunc = (productsArr) => {
+  Product.fetchAll().then(arr => _getProducts(arr)).catch(err => _error(err));
+  
+  function _getProducts(arr) {
+    const productsArr = arr[0];
+    if (!productsArr) return;
+
     const optionsObj = {
       path: path,
       pageTitle: 'Admin Products',
@@ -68,8 +85,10 @@ exports.getProducts = (request, response, next) => {
   
     response.render(path.join('admin', 'products.ejs'), optionsObj);
   }
-
-  Product.fetchAll(callbackFunc);
+  
+  function _error(err) {
+    console.log(err);
+  }
 };
 
 exports.postDeleteProduct = (request, response, next) => {
