@@ -3,7 +3,12 @@ const Product = require(path.join('..', 'models', 'product.js'));
 const Cart = require(path.join('..', 'models', 'cart.js'));
 
 exports.getProducts = (request, response, next) => {
-  const callbackFunc = (productsArr) => {
+  Product.fetchAll().then(arr => _getProducts(arr)).catch(err => _error(err));
+  
+  function _getProducts(arr) {
+    const productsArr = arr[0];
+    if (!productsArr) return;
+
     const optionsObj = {
       path: path,
       pageTitle: 'All Products',
@@ -13,8 +18,10 @@ exports.getProducts = (request, response, next) => {
   
     response.render(path.join('shop', 'product-list.ejs'), optionsObj);
   }
-
-  Product.fetchAll(callbackFunc);
+  
+  function _error(err) {
+    console.log(err);
+  }
 };
 
 exports.getProduct = (request, response, next) => {

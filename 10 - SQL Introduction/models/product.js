@@ -5,6 +5,8 @@ const rootDirectoryStr = path.dirname(require.main.filename);
 const Cart = require(path.join(rootDirectoryStr, 'models', 'cart.js'));
 const productsFilePath = path.join(rootDirectoryStr, 'data', 'products.json');
 
+const database = require(path.join(rootDirectoryStr, 'util', 'mySqlDatabaseCreds.js'));
+
 module.exports = class Product {
     constructor(productArgsObj) {
         this.title = productArgsObj.title;
@@ -26,10 +28,8 @@ module.exports = class Product {
         });
     }
 
-    static fetchAll(callbackFunc) {
-        fs.readFile(productsFilePath, (error, fileContent) => {
-            return this._readFileForFetchAll(callbackFunc, error, fileContent);
-        });
+    static fetchAll() {
+        return database.execute('SELECT * FROM products');
     }
 
     _readFileForSave(error, fileContent, callbackFunc) {
