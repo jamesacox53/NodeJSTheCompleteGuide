@@ -41,7 +41,12 @@ exports.getProduct = (request, response, next) => {
 };
 
 exports.getIndex = (request, response, next) => {
-  const callbackFunc = (productsArr) => {
+  Product.fetchAll().then(arr => _getProducts(arr)).catch(err => _error(err));
+  
+  function _getProducts(arr) {
+    const productsArr = arr[0];
+    if (!productsArr) return;
+
     const optionsObj = {
       path: path,
       pageTitle: 'Shop',
@@ -51,8 +56,10 @@ exports.getIndex = (request, response, next) => {
   
     response.render(path.join('shop', 'index.ejs'), optionsObj);
   }
-
-  Product.fetchAll(callbackFunc);
+  
+  function _error(err) {
+    console.log(err);
+  }
 };
 
 exports.postCart = (request, response, next) => {
@@ -78,7 +85,12 @@ exports.getCart = (request, response, next) => {
 
   function getCartView(response) {
     Cart.fetchCart((cartObj) => {
-      Product.fetchAll((productsArr) => {
+      Product.fetchAll().then(arr => _getProducts(arr)).catch(err => _error(err));
+  
+      function _getProducts(arr) {
+        const productsArr = arr[0];
+        if (!productsArr) return;
+        
         const cartViewProdsObjArr = _getCartViewProdObjArr(cartObj, productsArr);
 
         const optionsObj = {
@@ -89,7 +101,11 @@ exports.getCart = (request, response, next) => {
         };
       
         response.render(path.join('shop', 'cart.ejs'), optionsObj);
-      });
+      }
+  
+      function _error(err) {
+        console.log(err);
+      }
     });
   }
 
@@ -123,7 +139,12 @@ exports.getCart = (request, response, next) => {
 };
 
 exports.getOrders = (request, response, next) => {
-  const callbackFunc = (productsArr) => {
+  Product.fetchAll().then(arr => _getProducts(arr)).catch(err => _error(err));
+  
+  function _getProducts(arr) {
+    const productsArr = arr[0];
+    if (!productsArr) return;
+
     const optionsObj = {
       path: path,
       pageTitle: 'Orders',
@@ -133,12 +154,19 @@ exports.getOrders = (request, response, next) => {
   
     response.render(path.join('shop', 'orders.ejs'), optionsObj);
   }
-
-  Product.fetchAll(callbackFunc);
+  
+  function _error(err) {
+    console.log(err);
+  }
 };
 
 exports.getCheckout = (request, response, next) => {
-  const callbackFunc = (productsArr) => {
+  Product.fetchAll().then(arr => _getProducts(arr)).catch(err => _error(err));
+  
+  function _getProducts(arr) {
+    const productsArr = arr[0];
+    if (!productsArr) return;
+
     const optionsObj = {
       path: path,
       pageTitle: 'Checkout',
@@ -148,6 +176,8 @@ exports.getCheckout = (request, response, next) => {
   
     response.render(path.join('shop', 'checkout.ejs'), optionsObj);
   }
-
-  Product.fetchAll(callbackFunc);
+  
+  function _error(err) {
+    console.log(err);
+  }
 };
