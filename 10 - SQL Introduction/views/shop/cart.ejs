@@ -1,0 +1,21 @@
+<%- include(path.join('..', 'includes', 'head.ejs')) %>
+    </head>
+
+    <body>
+        <%- include(path.join('..', 'includes', 'navigation.ejs')) %>
+        <% if (cartViewProdsObjArr.length > 0) { %>    
+            <ul>
+                <% for (cartViewProdObj of cartViewProdsObjArr) { %>
+                    <li>
+                        <p><%= cartViewProdObj.product.title %> (<%= cartViewProdObj.cartProduct.quantity %>)</p>
+                        <form action="/cart-delete-item" method="POST">
+                            <input type="hidden" name="productID" value="<%= cartViewProdObj.product.id %>">
+                            <button class="btn" type="submit">Delete</button>
+                        </form>
+                    </li>
+                <% } %>    
+            </ul>
+        <% } else { %>
+            <h1>No Products</h1>
+        <% } %>    
+        <%- include(path.join('..', 'includes', 'end.ejs')) %>
