@@ -18,35 +18,36 @@ module.exports = class Product {
             this.id = productArgsObj.id;
         
         } else {
-            this.id = Math.random().toString();
+            this.id = null;
         }
     }
 
     save() {
-        return database.execute('INSERT INTO products (title, price, imageURL, description) VALUES (?, ?, ?, ?)',
-        [this.title, this.price, this.imageURL, this.description]);
+        // Update Product 
+        if (this.id) {
+            return database.execute('UPDATE products SET title = ?, price = ?, imageURL = ?, description = ? WHERE id = ?', 
+            [this.title, this.price, this.imageURL, this.description, this.id]);
+            
+        // Create Product    
+        } else {
+            return database.execute('INSERT INTO products (title, price, imageURL, description) VALUES (?, ?, ?, ?)',
+                [this.title, this.price, this.imageURL, this.description]);
+        }
     }
 
     static fetchAll() {
         return database.execute('SELECT * FROM products');
     }
 
-    static getProductByID(id, callbackFunc) {
-        this.fetchAll((productsArr) => {
-            this._getProductByIDFetchAll(id, productsArr, callbackFunc);
-        });
-    }
+    static getProductByID(id) {
+        return database.execute('SELECT * FROM products WHERE products.id = ?', [id])
+        .then(arr => _getIndividualProduct(arr));
 
-    static _getProductByIDFetchAll(id, productsArr, callbackFunc) {
-        for (let i = 0; i < productsArr.length; i++) {
-            const product = productsArr[i];
-
-            if (product.id == id) {
-                const actualProduct = new Product(product);
-
-                callbackFunc(actualProduct);
-                return;
-            }
+        function _getIndividualProduct(arr) {
+            const prodObj = arr[0][0];
+            const product = new Product(prodObj);
+            
+            return product;
         }
     }
 

@@ -3,7 +3,9 @@ const Product = require(path.join('..', 'models', 'product.js'));
 const Cart = require(path.join('..', 'models', 'cart.js'));
 
 exports.getProducts = (request, response, next) => {
-  Product.fetchAll().then(arr => _getProducts(arr)).catch(err => _error(err));
+  Product.fetchAll()
+  .then(arr => _getProducts(arr))
+  .catch(err => console.log(err));
   
   function _getProducts(arr) {
     const productsArr = arr[0];
@@ -18,14 +20,16 @@ exports.getProducts = (request, response, next) => {
   
     response.render(path.join('shop', 'product-list.ejs'), optionsObj);
   }
-  
-  function _error(err) {
-    console.log(err);
-  }
 };
 
 exports.getProduct = (request, response, next) => {
-  const callbackFunc = (product) => {
+  const productID = request.params.productID;
+  
+  Product.getProductByID(productID)
+  .then(product => _renderProductDetailsPage(product, response))
+  .catch(err => console.log(err));
+  
+  function _renderProductDetailsPage (product, response) {
     const optionsObj = {
       path: path,
       pageTitle: product.title,
@@ -35,15 +39,14 @@ exports.getProduct = (request, response, next) => {
 
     response.render(path.join('shop', 'product-detail.ejs'), optionsObj);
   }
-  
-  const productID = request.params.productID;
-  Product.getProductByID(productID, callbackFunc);
 };
 
 exports.getIndex = (request, response, next) => {
-  Product.fetchAll().then(arr => _getProducts(arr)).catch(err => _error(err));
+  Product.fetchAll()
+  .then(arr => _getProducts(arr, response))
+  .catch(err => console.log(err));
   
-  function _getProducts(arr) {
+  function _getProducts(arr, response) {
     const productsArr = arr[0];
     if (!productsArr) return;
 
@@ -56,20 +59,20 @@ exports.getIndex = (request, response, next) => {
   
     response.render(path.join('shop', 'index.ejs'), optionsObj);
   }
-  
-  function _error(err) {
-    console.log(err);
-  }
 };
 
 exports.postCart = (request, response, next) => {
   const productID = request.body.productID;
 
-  Product.getProductByID(productID, (product) => {
-    Cart.addProduct(product, (error) => {
+  Product.getProductByID(productID)
+  .then(product => _postCart(product))
+  .catch(err => console.log(err));
+
+  function _postCart(product) {
+    Cart.addProduct(product, (err) => {
       response.redirect('/cart');
     });
-  });
+  }
 };
 
 exports.postCartDeleteItem = (request, response, next) => {
@@ -85,9 +88,11 @@ exports.getCart = (request, response, next) => {
 
   function getCartView(response) {
     Cart.fetchCart((cartObj) => {
-      Product.fetchAll().then(arr => _getProducts(arr)).catch(err => _error(err));
+      Product.fetchAll()
+      .then(arr => _getProducts(arr, response))
+      .catch(err => console.log(err));
   
-      function _getProducts(arr) {
+      function _getProducts(arr, response) {
         const productsArr = arr[0];
         if (!productsArr) return;
         
@@ -101,10 +106,6 @@ exports.getCart = (request, response, next) => {
         };
       
         response.render(path.join('shop', 'cart.ejs'), optionsObj);
-      }
-  
-      function _error(err) {
-        console.log(err);
       }
     });
   }
@@ -139,9 +140,11 @@ exports.getCart = (request, response, next) => {
 };
 
 exports.getOrders = (request, response, next) => {
-  Product.fetchAll().then(arr => _getProducts(arr)).catch(err => _error(err));
+  Product.fetchAll()
+  .then(arr => _getProducts(arr, response))
+  .catch(err => console.log(err));
   
-  function _getProducts(arr) {
+  function _getProducts(arr, response) {
     const productsArr = arr[0];
     if (!productsArr) return;
 
@@ -154,16 +157,14 @@ exports.getOrders = (request, response, next) => {
   
     response.render(path.join('shop', 'orders.ejs'), optionsObj);
   }
-  
-  function _error(err) {
-    console.log(err);
-  }
 };
 
 exports.getCheckout = (request, response, next) => {
-  Product.fetchAll().then(arr => _getProducts(arr)).catch(err => _error(err));
+  Product.fetchAll()
+  .then(arr => _getProducts(arr, response))
+  .catch(err => console.log(err));
   
-  function _getProducts(arr) {
+  function _getProducts(arr, response) {
     const productsArr = arr[0];
     if (!productsArr) return;
 
@@ -175,9 +176,5 @@ exports.getCheckout = (request, response, next) => {
     };
   
     response.render(path.join('shop', 'checkout.ejs'), optionsObj);
-  }
-  
-  function _error(err) {
-    console.log(err);
   }
 };
