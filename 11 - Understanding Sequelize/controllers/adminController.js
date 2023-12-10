@@ -10,7 +10,7 @@ exports.getAddProductPage = (request, response, next) => {
    
   response.render(path.join('admin', 'add-product.ejs'), optionsObj);
 };
-  
+
 exports.postAddProduct = (request, response, next) => {
   const productArgsObj = {
     title: request.body.title,
@@ -31,7 +31,7 @@ exports.postAddProduct = (request, response, next) => {
 exports.getEditProductPage = (request, response, next) => {
   const productID = request.params.productID;
 
-  Product.getProductByID(productID)
+  Product.findByPk(productID)
   .then(product => _renderEditProductPage(product, response))
   .catch(err => console.log(err));
   
@@ -50,7 +50,7 @@ exports.getEditProductPage = (request, response, next) => {
 exports.postEditProduct = (request, response, next) => {
   const productID = request.body.productID;
   
-  Product.getProductByID(productID)
+  Product.findByPk(productID)
   .then(product => _editProductAndSave(product, request))
   .then(err => _gotoAdminProductPage(err, response))
   .catch(err => console.log(err));
@@ -70,19 +70,16 @@ exports.postEditProduct = (request, response, next) => {
 };
 
 exports.getProducts = (request, response, next) => {
-  Product.fetchAll()
+  Product.findAll()
   .then(arr => _renderAdminProductsPage(arr))
   .catch(err => console.log(err));
   
   function _renderAdminProductsPage(arr) {
-    const productsArr = arr[0];
-    if (!productsArr) return;
-
     const optionsObj = {
       path: path,
       pageTitle: 'Admin Products',
       pathStr: '/admin/products',
-      prods: productsArr
+      prods: arr
     };
   
     response.render(path.join('admin', 'products.ejs'), optionsObj);

@@ -22,7 +22,7 @@ exports.getProducts = (request, response, next) => {
 exports.getProduct = (request, response, next) => {
   const productID = request.params.productID;
   
-  Product.getProductByID(productID)
+  Product.findByPk(productID)
   .then(product => _renderProductDetailsPage(product, response))
   .catch(err => console.log(err));
   
@@ -134,19 +134,16 @@ exports.getCart = (request, response, next) => {
 };
 
 exports.getOrders = (request, response, next) => {
-  Product.fetchAll()
+  Product.findAll()
   .then(arr => _getProducts(arr, response))
   .catch(err => console.log(err));
   
   function _getProducts(arr, response) {
-    const productsArr = arr[0];
-    if (!productsArr) return;
-
     const optionsObj = {
       path: path,
       pageTitle: 'Orders',
       pathStr: '/orders',
-      prods: productsArr
+      prods: arr
     };
   
     response.render(path.join('shop', 'orders.ejs'), optionsObj);
@@ -154,19 +151,16 @@ exports.getOrders = (request, response, next) => {
 };
 
 exports.getCheckout = (request, response, next) => {
-  Product.fetchAll()
+  Product.findAll()
   .then(arr => _getProducts(arr, response))
   .catch(err => console.log(err));
   
   function _getProducts(arr, response) {
-    const productsArr = arr[0];
-    if (!productsArr) return;
-
     const optionsObj = {
       path: path,
       pageTitle: 'Checkout',
       pathStr: '/checkout',
-      prods: productsArr
+      prods: arr
     };
   
     response.render(path.join('shop', 'checkout.ejs'), optionsObj);
