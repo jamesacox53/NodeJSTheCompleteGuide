@@ -2,7 +2,7 @@ const path = require('path');
 const Sequelize = require('sequelize');
 
 const rootDirectoryStr = path.dirname(require.main.filename);
-const sequelize = require(rootDirectoryStr, 'util', 'mySqlDatabaseCreds.js');
+const sequelize = require(path.join(rootDirectoryStr, 'util', 'mySqlDatabaseCreds.js'));
 
 const productFieldAttributesObj = {
     id: {

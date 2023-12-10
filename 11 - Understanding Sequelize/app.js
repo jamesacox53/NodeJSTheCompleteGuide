@@ -11,6 +11,7 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 const rootDirectoryStr = path.dirname(require.main.filename);
+const sequelize = require(path.join(rootDirectoryStr, 'util', 'mySqlDatabaseCreds.js'));
 const adminRoutes = require(path.join(rootDirectoryStr, 'routes', 'adminRoutes.js'));
 const shopRoutes = require(path.join(rootDirectoryStr, 'routes', 'shopRoutes.js'));
 const errorRoutes = require(path.join(rootDirectoryStr, 'routes', 'errorRoutes.js'));
@@ -24,4 +25,6 @@ app.use(errorRoutes);
 
 const server = http.createServer(app);
 
-server.listen(3000);
+sequelize.sync()
+.then(res => server.listen(3000))
+.catch(err => console.log(err));
