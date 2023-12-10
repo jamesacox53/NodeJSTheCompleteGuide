@@ -3,19 +3,16 @@ const Product = require(path.join('..', 'models', 'product.js'));
 const Cart = require(path.join('..', 'models', 'cart.js'));
 
 exports.getProducts = (request, response, next) => {
-  Product.fetchAll()
+  Product.findAll()
   .then(arr => _getProducts(arr))
   .catch(err => console.log(err));
   
   function _getProducts(arr) {
-    const productsArr = arr[0];
-    if (!productsArr) return;
-
     const optionsObj = {
       path: path,
       pageTitle: 'All Products',
       pathStr: '/products',
-      prods: productsArr
+      prods: arr
     };
   
     response.render(path.join('shop', 'product-list.ejs'), optionsObj);
@@ -42,19 +39,16 @@ exports.getProduct = (request, response, next) => {
 };
 
 exports.getIndex = (request, response, next) => {
-  Product.fetchAll()
+  Product.findAll()
   .then(arr => _getProducts(arr, response))
   .catch(err => console.log(err));
   
   function _getProducts(arr, response) {
-    const productsArr = arr[0];
-    if (!productsArr) return;
-
     const optionsObj = {
       path: path,
       pageTitle: 'Shop',
       pathStr: '/',
-      prods: productsArr
+      prods: arr
     };
   
     response.render(path.join('shop', 'index.ejs'), optionsObj);

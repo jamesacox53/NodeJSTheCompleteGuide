@@ -19,9 +19,7 @@ exports.postAddProduct = (request, response, next) => {
     description: request.body.description
   };
   
-  const product = new Product(productArgsObj);
-
-  product.save()
+  Product.create(productArgsObj)
   .then(err => _gotoIndexPage(err, response))
   .catch(err => console.log(err));
   
