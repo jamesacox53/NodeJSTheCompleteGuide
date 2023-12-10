@@ -1,75 +1,34 @@
-const fs = require('fs');
 const path = require('path');
+const Sequelize = require('sequelize');
 
 const rootDirectoryStr = path.dirname(require.main.filename);
-const Cart = require(path.join(rootDirectoryStr, 'models', 'cart.js'));
-const productsFilePath = path.join(rootDirectoryStr, 'data', 'products.json');
+const sequelize = require(rootDirectoryStr, 'util', 'mySqlDatabaseCreds.js');
 
-const database = require(path.join(rootDirectoryStr, 'util', 'mySqlDatabaseCreds.js'));
-
-module.exports = class Product {
-    constructor(productArgsObj) {
-        this.title = productArgsObj.title;
-        this.imageURL = productArgsObj.imageURL;
-        this.description = productArgsObj.description;
-        this.price = productArgsObj.price;
-        
-        if (productArgsObj.id) {
-            this.id = productArgsObj.id;
-        
-        } else {
-            this.id = null;
-        }
+const productFieldAttributesObj = {
+    id: {
+        type: Sequelize.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true
+    },
+    title: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    price: {
+        type: Sequelize.DOUBLE,
+        allowNull: false
+    },
+    imageURL: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    description: {
+        type: Sequelize.STRING,
+        allowNull: false
     }
+};
 
-    save() {
-        // Update Product 
-        if (this.id) {
-            return database.execute('UPDATE products SET title = ?, price = ?, imageURL = ?, description = ? WHERE id = ?', 
-            [this.title, this.price, this.imageURL, this.description, this.id]);
-            
-        // Create Product    
-        } else {
-            return database.execute('INSERT INTO products (title, price, imageURL, description) VALUES (?, ?, ?, ?)',
-                [this.title, this.price, this.imageURL, this.description]);
-        }
-    }
+const Product = sequelize.define('product', productFieldAttributesObj);
 
-    static fetchAll() {
-        return database.execute('SELECT * FROM products');
-    }
-
-    static getProductByID(id) {
-        return database.execute('SELECT * FROM products WHERE products.id = ?', [id])
-        .then(arr => _getIndividualProduct(arr));
-
-        function _getIndividualProduct(arr) {
-            const prodObj = arr[0][0];
-            const product = new Product(prodObj);
-            
-            return product;
-        }
-    }
-
-    static deleteByID(id, callbackFunc) {
-        this.fetchAll((productsArr) => {
-            this._deleteProductByIDFetchAll(id, productsArr, callbackFunc);
-        });
-    }
-
-    static _deleteProductByIDFetchAll(id, productsArr, callbackFunc) {
-        const newProductsArr = [];
-        
-        for (let i = 0; i < productsArr.length; i++) {
-            const product = productsArr[i];
-
-            if (product.id != id)
-                newProductsArr.push(product);
-        }
-
-        var productsArrJSONStr = JSON.stringify(newProductsArr);
-        fs.writeFile(productsFilePath, productsArrJSONStr, (error) => {
-            Cart.deleteProductByID(id, callbackFunc);
-        });
-    }
-}
+module.exports = Product;
