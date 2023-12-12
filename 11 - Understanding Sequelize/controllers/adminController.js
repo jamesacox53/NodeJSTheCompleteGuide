@@ -72,7 +72,9 @@ exports.postEditProduct = (request, response, next) => {
 };
 
 exports.getProducts = (request, response, next) => {
-  Product.findAll()
+  const user = request.user;
+    
+  user.getProducts()
   .then(arr => _renderAdminProductsPage(arr))
   .catch(err => console.log(err));
   
