@@ -18,8 +18,10 @@ exports.postAddProduct = (request, response, next) => {
     price: request.body.price,
     description: request.body.description
   };
+
+  const user = request.user;
   
-  Product.create(productArgsObj)
+  user.createProduct(productArgsObj)
   .then(err => _gotoIndexPage(err, response))
   .catch(err => console.log(err));
   
