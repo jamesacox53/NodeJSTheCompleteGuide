@@ -78,58 +78,20 @@ exports.postCartDeleteItem = (request, response, next) => {
 };
 
 exports.getCart = (request, response, next) => {
-  getCartView(response);
-
-  function getCartView(response) {
-    Cart.fetchCart((cartObj) => {
-      Product.fetchAll()
-      .then(arr => _getProducts(arr, response))
-      .catch(err => console.log(err));
+  request.user.getCart()
+  .then(cart => cart.getProducts())
+  .then(products => _renderCartPage(products))
+  .catch(err => console.log(err));
   
-      function _getProducts(arr, response) {
-        const productsArr = arr[0];
-        if (!productsArr) return;
-        
-        const cartViewProdsObjArr = _getCartViewProdObjArr(cartObj, productsArr);
-
-        const optionsObj = {
-        path: path,
-        pageTitle: 'Your Cart',
-        pathStr: '/cart',
-        cartViewProdsObjArr: cartViewProdsObjArr
-        };
-      
-        response.render(path.join('shop', 'cart.ejs'), optionsObj);
-      }
-    });
-  }
-
-  function _getCartViewProdObjArr(cartObj, productsArr) {
-    const cartViewProdsObjArr = [];
-    const cartProdsArr = cartObj.productsArr;
-
-    for (let i = 0; i < cartProdsArr.length; i++) {
-      const cartProduct = cartProdsArr[i];
-      const product = _getProductForCartProduct(cartProduct, productsArr);
-      if (!product) continue;
-
-      const cartViewProdObj = {
-        product: product,
-        cartProduct: cartProduct
-      };
-
-      cartViewProdsObjArr.push(cartViewProdObj);
-    }
-
-    return cartViewProdsObjArr;
-  }
-  
-  function _getProductForCartProduct(cartProduct, productsArr) {
-    for (let i = 0; i < productsArr.length; i++) {
-      const product = productsArr[i];
-      if (cartProduct.id == product.id)
-        return product;
-    }
+  function _renderCartPage(products) {
+    const optionsObj = {
+      path: path,
+      pageTitle: 'Your Cart',
+      pathStr: '/cart',
+      cartViewProdsObjArr: products
+    };
+    
+    response.render(path.join('shop', 'cart.ejs'), optionsObj);
   }
 };
 
