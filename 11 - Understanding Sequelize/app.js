@@ -30,5 +30,6 @@ app.use(errorRoutes);
 const server = http.createServer(app);
 
 sequelize.sync()
+// sequelize.sync({ force: true })
 .then(res => server.listen(3000))
 .catch(err => console.log(err));
