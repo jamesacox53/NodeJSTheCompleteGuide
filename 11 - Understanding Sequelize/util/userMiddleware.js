@@ -35,7 +35,7 @@ module.exports = (request, response, next) => {
     }
 
     function _createCartForUserIfDoesntExist(cart, request) {
-        if (cart) return;
+        if (cart) return cart;
                 
         return request.user.createCart();
     }

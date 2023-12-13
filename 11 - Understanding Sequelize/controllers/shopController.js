@@ -57,15 +57,27 @@ exports.getIndex = (request, response, next) => {
 
 exports.postCart = (request, response, next) => {
   const productID = request.body.productID;
+  let userCart;
 
-  Product.getProductByID(productID)
-  .then(product => _postCart(product))
+  request.user.getCart()
+  .then(cart => { userCart = cart })
+  .then(err => Product.findByPk(productID))
+  .then(product => _addProductToCart(product, userCart))
+  .then(product => _redirectToCartPage(response))
   .catch(err => console.log(err));
 
-  function _postCart(product) {
-    Cart.addProduct(product, (err) => {
-      response.redirect('/cart');
-    });
+  function _addProductToCart(product, userCart) {
+    const properties = {
+      through: {
+        quantity: 1
+      }
+    }
+    
+    userCart.addProduct(product, properties);
+  }
+
+  function _redirectToCartPage(response) {
+    response.redirect('/cart');
   }
 };
 
