@@ -1,6 +1,7 @@
 const path = require('path');
 const Product = require(path.join('..', 'models', 'product.js'));
 const Cart = require(path.join('..', 'models', 'cart.js'));
+const CartItem = require(path.join('..', 'models', 'cart-item.js'));
 
 exports.getProducts = (request, response, next) => {
   Product.findAll()
@@ -58,22 +59,41 @@ exports.getIndex = (request, response, next) => {
 exports.postCart = (request, response, next) => {
   const productID = request.body.productID;
   let userCart;
-
+  
   request.user.getCart()
   .then(cart => { userCart = cart })
-  .then(err => Product.findByPk(productID))
-  .then(product => _addProductToCart(product, userCart))
-  .then(product => _redirectToCartPage(response))
+  .then(err => _getExistingProductCartItem(userCart, productID))
+  .then(productCartItem => _addProductToCart(userCart, productID, productCartItem))
+  .then(err => _redirectToCartPage(response))
   .catch(err => console.log(err));
 
-  function _addProductToCart(product, userCart) {
-    const properties = {
-      through: {
-        quantity: 1
+  function _getExistingProductCartItem(userCart, productID) {
+    const optionsObj = {
+      where: {
+        cartId: userCart.id,
+        productId: productID
       }
-    }
+    };
+
+    return CartItem.findOne(optionsObj);
+  }
+
+  function _addProductToCart(userCart, productID, productCartItem) {
+    if (productCartItem) {
+      const oldQuantityInt = parseInt(productCartItem.quantity, 10);
+      productCartItem.quantity = (oldQuantityInt + 1);
+
+      return productCartItem.save();
     
-    userCart.addProduct(product, properties);
+    } else {
+      const cartItemObj = {
+          quantity: 1,
+          cartId: userCart.id,
+          productId: productID
+      };
+      
+      return CartItem.create(cartItemObj);
+    }
   }
 
   function _redirectToCartPage(response) {
@@ -100,7 +120,7 @@ exports.getCart = (request, response, next) => {
       path: path,
       pageTitle: 'Your Cart',
       pathStr: '/cart',
-      cartViewProdsObjArr: products
+      productsArr: products
     };
     
     response.render(path.join('shop', 'cart.ejs'), optionsObj);
