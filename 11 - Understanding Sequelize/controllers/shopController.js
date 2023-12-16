@@ -87,9 +87,9 @@ exports.postCart = (request, response, next) => {
     
     } else {
       const cartItemObj = {
-          quantity: 1,
-          cartId: userCart.id,
-          productId: productID
+        quantity: 1,
+        cartId: userCart.id,
+        productId: productID
       };
       
       return CartItem.create(cartItemObj);
@@ -104,9 +104,46 @@ exports.postCart = (request, response, next) => {
 exports.postCartDeleteItem = (request, response, next) => {
   const productID = request.body.productID;
 
-  Cart.deleteProductByID(productID, (error) => {
+  request.user.getCart()
+  .then(cart => _getCartItemsArr(cart, productID))
+  .then(cartItemsArr => _destroyAllCartItems(cartItemsArr))
+  .then(err => _redirectToCart(response))
+  .catch(err => console.log(err));
+
+  function _getCartItemsArr(cart, productID) {
+    const optionsObj = {
+      where: {
+        cartId: cart.id,
+        productId: productID
+      }
+    };
+
+    return CartItem.findAll(optionsObj);
+  }
+
+  function _destroyAllCartItems(cartItemsArr) {
+    const cartItemIdArr = [];
+    
+    for (let i = 0; i < cartItemsArr.length; i++) {
+      const cartItem = cartItemsArr[i];
+
+      cartItemIdArr.push(cartItem.id);
+    }
+
+    if (cartItemIdArr.length < 1) return;
+
+    const destroyOptionsObj = {
+      where: {
+        id: cartItemIdArr
+      }
+    };
+
+    return CartItem.destroy(destroyOptionsObj);
+  }
+
+  function _redirectToCart(response) {
     response.redirect('/cart');
-  });
+  }
 };
 
 exports.getCart = (request, response, next) => {
