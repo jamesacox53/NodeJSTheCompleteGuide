@@ -1,7 +1,7 @@
 const path = require('path');
 const Product = require(path.join('..', 'models', 'product.js'));
-const Cart = require(path.join('..', 'models', 'cart.js'));
 const CartItem = require(path.join('..', 'models', 'cart-item.js'));
+const OrderItem = require(path.join('..', 'models', 'order-item.js'));
 
 exports.getProducts = (request, response, next) => {
   Product.findAll()
@@ -157,6 +157,50 @@ exports.getOrders = (request, response, next) => {
     };
   
     response.render(path.join('shop', 'orders.ejs'), optionsObj);
+  }
+};
+
+exports.postOrder = (request, response, next) => {
+  let userCartItemsArr;
+  
+  request.user.getCart()
+  .then(cart => _getCartItemsArr(cart))
+  .then(cartItemsArr => { userCartItemsArr = cartItemsArr })
+  .then(err => request.user.createOrder())
+  .then(order => _createOrderItems(order, userCartItemsArr))
+  .then(err => _redirectToOrdersPage(response))
+  .catch(err => console.log(err));
+
+  function _getCartItemsArr(cart) {
+    const optionsObj = {
+      where: {
+        cartId: cart.id
+      }
+    };
+    
+    return CartItem.findAll(optionsObj);
+  }
+
+  function _createOrderItems(order, userCartItemsArr) {
+    const orderItemArr = [];
+
+    for(let i = 0; i < userCartItemsArr.length; i++) {
+      const userCartItemObj = userCartItemsArr[i];
+      
+      const orderItemObj = {
+        orderId: order.id,
+        productId: userCartItemObj.productId,
+        quantity: userCartItemObj.quantity,
+      };
+
+      orderItemArr.push(orderItemObj);
+    }
+    
+    return OrderItem.bulkCreate(orderItemArr);
+  }
+
+  function _redirectToOrdersPage(response) {
+    response.redirect('/orders');
   }
 };
 
