@@ -105,12 +105,11 @@ exports.postCartDeleteItem = (request, response, next) => {
   const productID = request.body.productID;
 
   request.user.getCart()
-  .then(cart => _getCartItemsArr(cart, productID))
-  .then(cartItemsArr => _destroyAllCartItems(cartItemsArr))
+  .then(cart => _deleteCartItem(cart, productID))
   .then(err => _redirectToCart(response))
   .catch(err => console.log(err));
 
-  function _getCartItemsArr(cart, productID) {
+  function _deleteCartItem(cart, productID) {
     const optionsObj = {
       where: {
         cartId: cart.id,
@@ -118,27 +117,7 @@ exports.postCartDeleteItem = (request, response, next) => {
       }
     };
 
-    return CartItem.findAll(optionsObj);
-  }
-
-  function _destroyAllCartItems(cartItemsArr) {
-    const cartItemIdArr = [];
-    
-    for (let i = 0; i < cartItemsArr.length; i++) {
-      const cartItem = cartItemsArr[i];
-
-      cartItemIdArr.push(cartItem.id);
-    }
-
-    if (cartItemIdArr.length < 1) return;
-
-    const destroyOptionsObj = {
-      where: {
-        id: cartItemIdArr
-      }
-    };
-
-    return CartItem.destroy(destroyOptionsObj);
+    return CartItem.destroy(optionsObj);
   }
 
   function _redirectToCart(response) {
