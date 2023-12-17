@@ -1,5 +1,6 @@
 const path = require('path');
 const Product = require(path.join('..', 'models', 'product.js'));
+const Order = require(path.join('..', 'models', 'order.js'));
 const CartItem = require(path.join('..', 'models', 'cart-item.js'));
 const OrderItem = require(path.join('..', 'models', 'order-item.js'));
 
@@ -144,16 +145,27 @@ exports.getCart = (request, response, next) => {
 };
 
 exports.getOrders = (request, response, next) => {
-  Product.findAll()
-  .then(arr => _getProducts(arr, response))
-  .catch(err => console.log(err));
+  _getOrdersWithProducts(request.user)
+  .then(ordersArr => _renderOrdersPage(ordersArr))
+  .catch(err => console.log(err))
   
-  function _getProducts(arr, response) {
+  function  _getOrdersWithProducts(user) {
+    const optionsObj = {
+      include: [{
+        model: Product,
+        required: true
+       }]
+    };
+
+    return user.getOrders(optionsObj);
+  }
+
+  function _renderOrdersPage(ordersArr) {
     const optionsObj = {
       path: path,
-      pageTitle: 'Orders',
+      pageTitle: 'Your Orders',
       pathStr: '/orders',
-      prods: arr
+      ordersArr: ordersArr
     };
   
     response.render(path.join('shop', 'orders.ejs'), optionsObj);
@@ -161,20 +173,23 @@ exports.getOrders = (request, response, next) => {
 };
 
 exports.postOrder = (request, response, next) => {
+  let userCart;
   let userCartItemsArr;
   
   request.user.getCart()
-  .then(cart => _getCartItemsArr(cart))
+  .then(cart => { userCart = cart })
+  .then(err => _getCartItemsArr(userCart))
   .then(cartItemsArr => { userCartItemsArr = cartItemsArr })
   .then(err => request.user.createOrder())
   .then(order => _createOrderItems(order, userCartItemsArr))
+  .then(err => _deleteCartItems(userCart))
   .then(err => _redirectToOrdersPage(response))
   .catch(err => console.log(err));
 
-  function _getCartItemsArr(cart) {
+  function _getCartItemsArr(userCart) {
     const optionsObj = {
       where: {
-        cartId: cart.id
+        cartId: userCart.id
       }
     };
     
@@ -197,6 +212,16 @@ exports.postOrder = (request, response, next) => {
     }
     
     return OrderItem.bulkCreate(orderItemArr);
+  }
+
+  function _deleteCartItems(userCart) {
+    const optionsObj = {
+      where: {
+        cartId: userCart.id
+      }
+    };
+
+    return CartItem.destroy(optionsObj);
   }
 
   function _redirectToOrdersPage(response) {
