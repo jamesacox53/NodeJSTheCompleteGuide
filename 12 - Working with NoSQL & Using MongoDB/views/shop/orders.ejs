@@ -1,0 +1,25 @@
+<%- include(path.join('..', 'includes', 'head.ejs')) %>
+    </head>
+
+    <body>
+        <%- include(path.join('..', 'includes', 'navigation.ejs')) %>
+        <main>
+            <% if (ordersArr.length > 0) { %>
+                <ul>
+                    <% for (orderObj of ordersArr) { %>
+                        <li>
+                            <h1># <%= orderObj.id %></h1>
+                            <ul>
+                                <% for (product of orderObj.products) { %>
+                                    <li><%= product.title %> (<%= product.orderItem.quantity %>)</li>
+                                 <% } %>
+                            </ul>
+                        </li>
+                    <% } %>
+                </ul>
+
+            <% } else { %>
+                <h1>Nothing there!</h1>
+            <% } %>    
+        </main>
+        <%- include(path.join('..', 'includes', 'end.ejs')) %>

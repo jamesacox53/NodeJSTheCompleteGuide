@@ -1,0 +1,27 @@
+<%- include(path.join('..', 'includes', 'head.ejs')) %>
+    </head>
+
+    <body>
+        <%- include(path.join('..', 'includes', 'navigation.ejs')) %>
+        <% if (productsArr.length > 0) { %>    
+            <ul>
+                <% for (product of productsArr) { %>
+                    <li>
+                        <p><%= product.title %> (<%= product.cartItem.quantity %>)</p>
+                        <form action="/cart-delete-item" method="POST">
+                            <input type="hidden" name="productID" value="<%= product.id %>">
+                            <button class="btn" type="submit">Delete</button>
+                        </form>
+                    </li>
+                <% } %>    
+            </ul>
+            <hr>
+            <div class="centered">
+                <form action="/create-order" method="POST">
+                    <button type="submit" class="btn">Order Now</button>
+                </form>
+            </div>
+        <% } else { %>
+            <h1>No Products</h1>
+        <% } %>    
+        <%- include(path.join('..', 'includes', 'end.ejs')) %>
