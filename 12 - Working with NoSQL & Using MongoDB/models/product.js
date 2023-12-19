@@ -4,7 +4,7 @@ const path = require('path');
 const rootDirectoryStr = path.dirname(require.main.filename);
 // const sequelize = require(path.join(rootDirectoryStr, 'util', 'mySqlDatabaseCreds.js'));
 const mongoDatabase = require(path.join(rootDirectoryStr, 'util', 'mongoDBCreds.js'));
-const getDBFunc = mongoDatabase.getDB;
+const getDB = mongoDatabase.getDB;
 
 class Product {
     constructor(argsObj) {
@@ -12,6 +12,12 @@ class Product {
         this.price = argsObj.price;
         this.description = argsObj.description;
         this.imageURL = argsObj.imageURL;
+    }
+
+    save() {
+        const db = getDB();
+
+        return db.collection('products').insertOne(this);
     }
 }
 

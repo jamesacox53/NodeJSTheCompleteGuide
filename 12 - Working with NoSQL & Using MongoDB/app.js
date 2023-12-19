@@ -44,6 +44,4 @@ sequelize.sync()
 .catch(err => console.log(err));
 */
 
-mongoConnect(() => {
-    server.listen(3000);
-  });
+mongoConnect(() => server.listen(3000));
