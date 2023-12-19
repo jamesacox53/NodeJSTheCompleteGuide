@@ -11,7 +11,8 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 const rootDirectoryStr = path.dirname(require.main.filename);
-const mongoConnect = require(path.join(rootDirectoryStr, 'util', 'mongoDBCreds.js'));
+const mongoDatabase = require(path.join(rootDirectoryStr, 'util', 'mongoDBCreds.js'));
+const mongoConnect = mongoDatabase.mongoConnect;
 
 /*
 const sequelize = require(path.join(rootDirectoryStr, 'util', 'mySqlDatabaseCreds.js'));
@@ -43,7 +44,6 @@ sequelize.sync()
 .catch(err => console.log(err));
 */
 
-mongoConnect((client) => {
-    console.log(client);
+mongoConnect(() => {
     server.listen(3000);
   });
