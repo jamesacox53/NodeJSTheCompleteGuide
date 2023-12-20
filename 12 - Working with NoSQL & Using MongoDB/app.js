@@ -18,22 +18,22 @@ const mongoConnect = mongoDatabase.mongoConnect;
 const sequelize = require(path.join(rootDirectoryStr, 'util', 'mySqlDatabaseCreds.js'));
 const sequelizeAssociations = require(path.join(rootDirectoryStr, 'models', 'associations.js'));
 const userMiddleware = require(path.join(rootDirectoryStr, 'util', 'userMiddleware.js'));
-
-const adminRoutes = require(path.join(rootDirectoryStr, 'routes', 'adminRoutes.js'));
-const shopRoutes = require(path.join(rootDirectoryStr, 'routes', 'shopRoutes.js'));
-const errorRoutes = require(path.join(rootDirectoryStr, 'routes', 'errorRoutes.js'));
 */
+const adminRoutes = require(path.join(rootDirectoryStr, 'routes', 'adminRoutes.js'));
+// const shopRoutes = require(path.join(rootDirectoryStr, 'routes', 'shopRoutes.js'));
+// const errorRoutes = require(path.join(rootDirectoryStr, 'routes', 'errorRoutes.js'));
+
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(rootDirectoryStr, 'public')));
 
-/*
-app.use(userMiddleware);
+
+// app.use(userMiddleware);
 
 app.use(adminRoutes);
-app.use(shopRoutes);
-app.use(errorRoutes);
-*/
+// app.use(shopRoutes);
+// app.use(errorRoutes);
+
 
 const server = http.createServer(app);
 
