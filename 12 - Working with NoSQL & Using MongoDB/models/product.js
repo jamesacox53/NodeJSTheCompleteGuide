@@ -1,4 +1,5 @@
 const path = require('path');
+const mongodb = require('mongodb');
 
 const rootDirectoryStr = path.dirname(require.main.filename);
 const mongoDatabase = require(path.join(rootDirectoryStr, 'util', 'mongoDBCreds.js'));
@@ -22,6 +23,13 @@ class Product {
         const db = getDB();
 
         return db.collection('products').find().toArray();
+    }
+
+    static findById(productID) {
+        const db = getDB();
+        const mongoIDObj = new mongodb.ObjectId(productID);
+        
+        return db.collection('products').find({ _id: mongoIDObj }).next();
     }
 }
 

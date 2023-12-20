@@ -21,11 +21,10 @@ exports.getProducts = (request, response, next) => {
   }
 };
 
-/*
 exports.getProduct = (request, response, next) => {
   const productID = request.params.productID;
   
-  Product.findByPk(productID)
+  Product.findById(productID)
   .then(product => _renderProductDetailsPage(product, response))
   .catch(err => console.log(err));
   
@@ -40,7 +39,6 @@ exports.getProduct = (request, response, next) => {
     response.render(path.join('shop', 'product-detail.ejs'), optionsObj);
   }
 };
-*/
 
 exports.getIndex = (request, response, next) => {
   Product.fetchAll()
