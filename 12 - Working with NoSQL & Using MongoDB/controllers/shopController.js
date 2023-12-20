@@ -1,11 +1,11 @@
 const path = require('path');
 const Product = require(path.join('..', 'models', 'product.js'));
-const Order = require(path.join('..', 'models', 'order.js'));
-const CartItem = require(path.join('..', 'models', 'cart-item.js'));
-const OrderItem = require(path.join('..', 'models', 'order-item.js'));
+// const Order = require(path.join('..', 'models', 'order.js'));
+// const CartItem = require(path.join('..', 'models', 'cart-item.js'));
+// const OrderItem = require(path.join('..', 'models', 'order-item.js'));
 
 exports.getProducts = (request, response, next) => {
-  Product.findAll()
+  Product.fetchAll()
   .then(arr => _getProducts(arr))
   .catch(err => console.log(err));
   
@@ -21,6 +21,7 @@ exports.getProducts = (request, response, next) => {
   }
 };
 
+/*
 exports.getProduct = (request, response, next) => {
   const productID = request.params.productID;
   
@@ -39,9 +40,10 @@ exports.getProduct = (request, response, next) => {
     response.render(path.join('shop', 'product-detail.ejs'), optionsObj);
   }
 };
+*/
 
 exports.getIndex = (request, response, next) => {
-  Product.findAll()
+  Product.fetchAll()
   .then(arr => _getProducts(arr, response))
   .catch(err => console.log(err));
   
@@ -57,6 +59,7 @@ exports.getIndex = (request, response, next) => {
   }
 };
 
+/*
 exports.postCart = (request, response, next) => {
   const productID = request.body.productID;
   let userCart;
@@ -245,3 +248,4 @@ exports.getCheckout = (request, response, next) => {
     response.render(path.join('shop', 'checkout.ejs'), optionsObj);
   }
 };
+*/
