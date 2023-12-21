@@ -33,7 +33,7 @@ exports.postAddProduct = (request, response, next) => {
 exports.getEditProductPage = (request, response, next) => {
   const productID = request.params.productID;
 
-  Product.findByPk(productID)
+  Product.findById(productID)
   .then(product => _renderEditProductPage(product, response))
   .catch(err => console.log(err));
   
@@ -52,7 +52,7 @@ exports.getEditProductPage = (request, response, next) => {
 exports.postEditProduct = (request, response, next) => {
   const productID = request.body.productID;
   
-  Product.findByPk(productID)
+  Product.findById(productID)
   .then(product => _editProductAndSave(product, request))
   .then(err => _gotoAdminProductPage(err, response))
   .catch(err => console.log(err));
