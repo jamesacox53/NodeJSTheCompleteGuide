@@ -4,22 +4,24 @@ const rootDirectoryStr = path.dirname(require.main.filename);
 const User = require(path.join(rootDirectoryStr, 'models', 'user.js'));
 
 module.exports = (request, response, next) => {
-    User.findByPk(1)
+    User.findById('6585ece642d2959c84a84f58')
     .then(user => _ifUserDoesntExistThenCreateUser(user))
     .then(user => _addUserToRequest(user, request))
-    .then(err => _getUserCart(request))
-    .then(cart => _createCartForUserIfDoesntExist(cart, request))
+    // .then(err => _getUserCart(request))
+    // .then(cart => _createCartForUserIfDoesntExist(cart, request))
     .then(err => _gotoNextMiddleware(next))
     .catch(err => console.log(err));
 
     function _ifUserDoesntExistThenCreateUser(user) {
         if (!user) {
             const dummyUserObj = {
-                name: 'James',
+                username: 'James',
                 email: 'test123@gmail.com'
             };
+
+            const dummyUser = new User(dummyUserObj);
             
-            return User.create(dummyUserObj);
+            return dummyUser.save(dummyUserObj);
         
         } else {
             return user;

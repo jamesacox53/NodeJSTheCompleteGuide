@@ -74,6 +74,8 @@ class Product {
     }
 
     static _getProduct(mongoProduct) {
+        if (!mongoProduct) return null;
+        
         const argsObj = {
             title: mongoProduct.title,
             price: mongoProduct.price,
