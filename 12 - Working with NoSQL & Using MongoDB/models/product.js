@@ -93,6 +93,13 @@ class Product {
         .find({ _id: mongoIDObj }).next()
         .then(mongoProduct => this._getProduct(mongoProduct));
     }
+
+    static deleteById(productID) {
+        const db = getDB();
+        const mongoIDObj = new mongodb.ObjectId(productID);
+        
+        return db.collection('products').deleteOne({ _id: mongoIDObj });
+    }
 }
 
 module.exports = Product;
