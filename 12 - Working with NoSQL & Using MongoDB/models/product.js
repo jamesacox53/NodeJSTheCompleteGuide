@@ -11,6 +11,7 @@ class Product {
         this.price = argsObj.price;
         this.description = argsObj.description;
         this.imageURL = argsObj.imageURL;
+        this.userID = argsObj.userID;
 
         if (argsObj._id)
             this._id = argsObj._id;
@@ -33,7 +34,8 @@ class Product {
             title: this.title,
             price: this.price,
             description: this.description,
-            imageURL: this.imageURL
+            imageURL: this.imageURL,
+            userID: this.userID
         };
 
         if (this._id)
@@ -81,6 +83,7 @@ class Product {
             price: mongoProduct.price,
             description: mongoProduct.description,
             imageURL: mongoProduct.imageURL,
+            userID: mongoProduct.userID,
             _id: mongoProduct._id
         };
 
