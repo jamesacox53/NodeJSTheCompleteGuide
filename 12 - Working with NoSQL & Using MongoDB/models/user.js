@@ -91,6 +91,67 @@ class User {
         return db.collection('users').deleteOne({ _id: mongoIDObj });
     }
 
+    getCart() {
+        return this.constructor
+        ._getProducts(this.cart)
+        .toArray()
+        .then(products => this.constructor._getProductObjArr(products, this.cart));
+    }
+
+    static _getProducts(cart) {
+        const db = getDB();
+        const productIDArr = this._getCartProductIDArr(cart);
+
+        
+        return db.collection('products').find({ _id: { $in: productIDArr } });
+    }
+
+    static _getCartProductIDArr(cart) {
+        const productIDArr = [];
+        const productsArr = cart.products;
+        
+        for (let i = 0; i < productsArr.length; i++) {
+            const productObj = productsArr[i];
+            const productID = productObj.productID;
+
+            productIDArr.push(productID);
+        }
+
+        return productIDArr;
+    }
+
+    static _getProductObjArr(products, cart) {
+        const productObjArr = [];
+        const cartProductsArr = cart.products;
+        const productsObj = this._getObjFromArr(products);
+
+        for(let i = 0; i < cartProductsArr.length; i++) {
+            const cartProduct = cartProductsArr[i];
+            const product = productsObj[cartProduct.productID.toString()];
+
+            const productObj = {
+                product: product,
+                quantity: cartProduct.quantity
+            };
+
+            productObjArr.push(productObj);
+        }
+
+        return productObjArr;
+    }
+
+    static _getObjFromArr(arr) {
+        const retObj = {};
+
+        for(let i = 0; i < arr.length; i++) {
+            const elem = arr[i];
+            
+            retObj[elem._id.toString()] = elem;
+        }
+
+        return retObj;
+    }
+
     addToCart(product) {
         const productsArr = this.cart.products;
         const productIndex = this.constructor._getProductIndex(product, productsArr);

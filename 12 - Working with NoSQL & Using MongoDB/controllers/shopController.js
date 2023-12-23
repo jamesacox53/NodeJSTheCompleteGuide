@@ -95,24 +95,25 @@ exports.postCartDeleteItem = (request, response, next) => {
   }
 };
 
+*/
 exports.getCart = (request, response, next) => {
   request.user.getCart()
-  .then(cart => cart.getProducts())
-  .then(products => _renderCartPage(products))
+  .then(cartProducts => _renderCartPage(cartProducts))
   .catch(err => console.log(err));
   
-  function _renderCartPage(products) {
+  function _renderCartPage(cartProducts) {
     const optionsObj = {
       path: path,
       pageTitle: 'Your Cart',
       pathStr: '/cart',
-      productsArr: products
+      productsArr: cartProducts
     };
     
     response.render(path.join('shop', 'cart.ejs'), optionsObj);
   }
 };
 
+/*
 exports.getOrders = (request, response, next) => {
   _getOrdersWithProducts(request.user)
   .then(ordersArr => _renderOrdersPage(ordersArr))
