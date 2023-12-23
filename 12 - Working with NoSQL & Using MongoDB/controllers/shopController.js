@@ -57,52 +57,20 @@ exports.getIndex = (request, response, next) => {
   }
 };
 
-/*
 exports.postCart = (request, response, next) => {
   const productID = request.body.productID;
-  let userCart;
   
-  request.user.getCart()
-  .then(cart => { userCart = cart })
-  .then(err => _getExistingProductCartItem(userCart, productID))
-  .then(productCartItem => _addProductToCart(userCart, productID, productCartItem))
+  Product.findById(productID)
+  .then(product => request.user.addToCart(product))
   .then(err => _redirectToCartPage(response))
   .catch(err => console.log(err));
-
-  function _getExistingProductCartItem(userCart, productID) {
-    const optionsObj = {
-      where: {
-        cartId: userCart.id,
-        productId: productID
-      }
-    };
-
-    return CartItem.findOne(optionsObj);
-  }
-
-  function _addProductToCart(userCart, productID, productCartItem) {
-    if (productCartItem) {
-      const oldQuantityInt = parseInt(productCartItem.quantity, 10);
-      productCartItem.quantity = (oldQuantityInt + 1);
-
-      return productCartItem.save();
-    
-    } else {
-      const cartItemObj = {
-        quantity: 1,
-        cartId: userCart.id,
-        productId: productID
-      };
-      
-      return CartItem.create(cartItemObj);
-    }
-  }
 
   function _redirectToCartPage(response) {
     response.redirect('/cart');
   }
 };
 
+/*
 exports.postCartDeleteItem = (request, response, next) => {
   const productID = request.body.productID;
 

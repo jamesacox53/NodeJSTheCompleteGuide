@@ -4,7 +4,7 @@ const rootDirectoryStr = path.dirname(require.main.filename);
 const User = require(path.join(rootDirectoryStr, 'models', 'user.js'));
 
 module.exports = (request, response, next) => {
-    User.findById('6585ece642d2959c84a84f58')
+    User.findById('6586d2c801dc3aa3242fad3c')
     .then(user => _ifUserDoesntExistThenCreateUser(user))
     .then(user => _addUserToRequest(user, request))
     // .then(err => _getUserCart(request))

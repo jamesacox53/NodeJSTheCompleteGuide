@@ -106,9 +106,8 @@ class User {
     static _getProductIndex(product, productsArr) {
         for (let i = 0; i < productsArr.length; i++) {
             const prodObj = productsArr[i];
-            const prod = prodObj.product;
-
-            if (prod._id == product._id)
+            
+            if (prodObj._id == product._id)
                 return i;
         }
 
@@ -116,9 +115,9 @@ class User {
     }
 
     static _addProductToCart(_id, product, cart) {
-        const productsArr = this.cart.products;
+        const productsArr = cart.products;
         const productObj = {
-            product: product,
+            _id: product._id,
             quantity: 1
         };
 
@@ -128,6 +127,7 @@ class User {
     }
 
     static _updateUserCartInDatabase(_id, cart) {
+        const db = getDB();
         const mongoIDObj = new mongodb.ObjectId(_id);
         const filterObj = { _id: mongoIDObj };
         const updateObj = {
