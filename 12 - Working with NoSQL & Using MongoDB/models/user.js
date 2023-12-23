@@ -104,10 +104,13 @@ class User {
     }
 
     static _getProductIndex(product, productsArr) {
+        const productIDStr = product._id.toString();
+        
         for (let i = 0; i < productsArr.length; i++) {
             const prodObj = productsArr[i];
+            const prodIDStr = prodObj.productID.toString();
             
-            if (prodObj._id == product._id)
+            if (prodIDStr == productIDStr)
                 return i;
         }
 
@@ -117,7 +120,7 @@ class User {
     static _addProductToCart(_id, product, cart) {
         const productsArr = cart.products;
         const productObj = {
-            _id: product._id,
+            productID: product._id,
             quantity: 1
         };
 
@@ -140,7 +143,7 @@ class User {
     }
 
     static _updateProductQuantityInCart(_id, productIndex, cart) {
-        const productsArr = this.cart.products;
+        const productsArr = cart.products;
         const productObj = productsArr[productIndex];
         
         const oldQuantity = parseInt(productObj['quantity'], 10);
