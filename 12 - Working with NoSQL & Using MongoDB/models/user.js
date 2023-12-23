@@ -9,9 +9,18 @@ class User {
     constructor(argsObj) {
         this.username = argsObj.username;
         this.email = argsObj.email;
-
+        
         if (argsObj._id)
             this._id = argsObj._id;
+
+        if (argsObj.cart) {
+            this.cart = argsObj.cart;
+        
+        } else {
+            this.cart = {
+                products: []
+            };
+        }
     }
 
     save() {
@@ -29,7 +38,8 @@ class User {
     _getArgsObj() {
         const argsObj = {
             username: this.username,
-            email: this.email
+            email: this.email,
+            cart: this.cart
         };
 
         if (this._id)
@@ -64,13 +74,14 @@ class User {
         
         const argsObj = {
             username: mongoUser.username,
-            email: mongoUser.email
+            email: mongoUser.email,
+            cart: mongoUser.cart
         };
 
         if (mongoUser._id)
             argsObj['_id'] = mongoUser._id;
 
-        return argsObj;
+        return new User(argsObj);
     }
 
     static deleteById(userID) {
@@ -78,6 +89,66 @@ class User {
         const mongoIDObj = new mongodb.ObjectId(userID);
         
         return db.collection('users').deleteOne({ _id: mongoIDObj });
+    }
+
+    addToCart(product) {
+        const productsArr = this.cart.products;
+        const productIndex = this.constructor._getProductIndex(product, productsArr);
+
+        if (productIndex == -1) {
+            return this.constructor._addProductToCart(this._id, product, this.cart);
+        
+        } else {
+            return this.constructor._updateProductQuantityInCart(this._id, productIndex, this.cart);
+        }
+    }
+
+    static _getProductIndex(product, productsArr) {
+        for (let i = 0; i < productsArr.length; i++) {
+            const prodObj = productsArr[i];
+            const prod = prodObj.product;
+
+            if (prod._id == product._id)
+                return i;
+        }
+
+        return -1;
+    }
+
+    static _addProductToCart(_id, product, cart) {
+        const productsArr = this.cart.products;
+        const productObj = {
+            product: product,
+            quantity: 1
+        };
+
+        productsArr.push(productObj);
+
+        return this._updateUserCartInDatabase(_id, cart);
+    }
+
+    static _updateUserCartInDatabase(_id, cart) {
+        const mongoIDObj = new mongodb.ObjectId(_id);
+        const filterObj = { _id: mongoIDObj };
+        const updateObj = {
+            $set: {
+                cart: cart
+            }
+        };
+
+        return db.collection('users').updateOne(filterObj, updateObj);
+    }
+
+    static _updateProductQuantityInCart(_id, productIndex, cart) {
+        const productsArr = this.cart.products;
+        const productObj = productsArr[productIndex];
+        
+        const oldQuantity = parseInt(productObj['quantity'], 10);
+        const newQuantity = oldQuantity + 1; 
+        
+        productObj['quantity'] = newQuantity;
+
+        return this._updateUserCartInDatabase(_id, cart);
     }
 }
 
