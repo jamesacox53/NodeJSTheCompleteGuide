@@ -238,15 +238,16 @@ class User {
     }
 
     addOrder() {
-        return this.constructor._addOrder(this._id, this.cart)
+        return this.getCart()
+        .then(productObjArr => this.constructor._addOrder(this._id, productObjArr))
         .then(err => this.constructor._resetCart(this));
     }
 
-    static _addOrder(_id, cart) {
+    static _addOrder(_id, productObjArr) {
         const db = getDB();
         const orderObj = {
             userID: _id,
-            cart: cart
+            cart: productObjArr
         }
 
         return db.collection('orders').insertOne(orderObj);
