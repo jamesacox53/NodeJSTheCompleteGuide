@@ -214,6 +214,28 @@ class User {
 
         return this._updateUserCartInDatabase(_id, cart);
     }
+
+    deleteCartItem(productID) {
+        this.constructor._removeCartItem(this.cart, productID);
+
+        return this.constructor._updateUserCartInDatabase(this._id, this.cart);
+    }
+
+    static _removeCartItem(cart, productID) {
+        const newProductsArr = [];
+        const products = cart.products;
+        const productIDStr = productID.toString();
+
+        for(let i = 0; i < products.length; i++) {
+            const prod = products[i];
+            const prodIDStr = prod.productID.toString();
+
+            if (productIDStr != prodIDStr)
+                newProductsArr.push(prod);
+        }
+
+        cart.products = newProductsArr;
+    }
 }
 
 module.exports = User;

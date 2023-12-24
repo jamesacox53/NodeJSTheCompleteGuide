@@ -57,45 +57,6 @@ exports.getIndex = (request, response, next) => {
   }
 };
 
-exports.postCart = (request, response, next) => {
-  const productID = request.body.productID;
-  
-  Product.findById(productID)
-  .then(product => request.user.addToCart(product))
-  .then(err => _redirectToCartPage(response))
-  .catch(err => console.log(err));
-
-  function _redirectToCartPage(response) {
-    response.redirect('/cart');
-  }
-};
-
-/*
-exports.postCartDeleteItem = (request, response, next) => {
-  const productID = request.body.productID;
-
-  request.user.getCart()
-  .then(cart => _deleteCartItem(cart, productID))
-  .then(err => _redirectToCart(response))
-  .catch(err => console.log(err));
-
-  function _deleteCartItem(cart, productID) {
-    const optionsObj = {
-      where: {
-        cartId: cart.id,
-        productId: productID
-      }
-    };
-
-    return CartItem.destroy(optionsObj);
-  }
-
-  function _redirectToCart(response) {
-    response.redirect('/cart');
-  }
-};
-
-*/
 exports.getCart = (request, response, next) => {
   request.user.getCart()
   .then(cartProducts => _renderCartPage(cartProducts))
@@ -110,6 +71,31 @@ exports.getCart = (request, response, next) => {
     };
     
     response.render(path.join('shop', 'cart.ejs'), optionsObj);
+  }
+};
+
+exports.postCart = (request, response, next) => {
+  const productID = request.body.productID;
+  
+  Product.findById(productID)
+  .then(product => request.user.addToCart(product))
+  .then(err => _redirectToCartPage(response))
+  .catch(err => console.log(err));
+
+  function _redirectToCartPage(response) {
+    response.redirect('/cart');
+  }
+};
+
+exports.postCartDeleteItem = (request, response, next) => {
+  const productID = request.body.productID;
+
+  request.user.deleteCartItem(productID)
+  .then(err => _redirectToCart(response))
+  .catch(err => console.log(err));
+
+  function _redirectToCart(response) {
+    response.redirect('/cart');
   }
 };
 
