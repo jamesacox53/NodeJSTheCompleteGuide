@@ -236,6 +236,31 @@ class User {
 
         cart.products = newProductsArr;
     }
+
+    addOrder() {
+        return this.constructor._addOrder(this._id, this.cart)
+        .then(err => this.constructor._resetCart(this));
+    }
+
+    static _addOrder(_id, cart) {
+        const db = getDB();
+        const orderObj = {
+            userID: _id,
+            cart: cart
+        }
+
+        return db.collection('orders').insertOne(orderObj);
+    }
+
+    static _resetCart(user) {
+        const newCart = {
+            products: []
+        };
+
+        user.cart = newCart;
+        
+        return this._updateUserCartInDatabase(user._id, user.cart);
+    }
 }
 
 module.exports = User;
