@@ -239,14 +239,18 @@ class User {
 
     addOrder() {
         return this.getCart()
-        .then(productObjArr => this.constructor._addOrder(this._id, productObjArr))
+        .then(productObjArr => this.constructor._addOrder(this, productObjArr))
         .then(err => this.constructor._resetCart(this));
     }
 
-    static _addOrder(_id, productObjArr) {
+    static _addOrder(user, productObjArr) {
         const db = getDB();
         const orderObj = {
-            userID: _id,
+            user: {
+                _id: user._id,
+                username: user.username,
+                email: user.email
+            },
             cart: productObjArr
         }
 
@@ -261,6 +265,19 @@ class User {
         user.cart = newCart;
         
         return this._updateUserCartInDatabase(user._id, user.cart);
+    }
+
+    getOrders() {
+        const db = getDB();
+        const mongoIDObj = new mongodb.ObjectId(this._id);
+
+        const queryObj = {
+            'user._id': mongoIDObj
+        };
+
+        return db.collection('orders')
+        .find(queryObj)
+        .toArray();
     }
 }
 

@@ -99,23 +99,11 @@ exports.postCartDeleteItem = (request, response, next) => {
   }
 };
 
-/*
 exports.getOrders = (request, response, next) => {
-  _getOrdersWithProducts(request.user)
+  request.user.getOrders()
   .then(ordersArr => _renderOrdersPage(ordersArr))
   .catch(err => console.log(err))
   
-  function  _getOrdersWithProducts(user) {
-    const optionsObj = {
-      include: [{
-        model: Product,
-        required: true
-       }]
-    };
-
-    return user.getOrders(optionsObj);
-  }
-
   function _renderOrdersPage(ordersArr) {
     const optionsObj = {
       path: path,
@@ -127,7 +115,6 @@ exports.getOrders = (request, response, next) => {
     response.render(path.join('shop', 'orders.ejs'), optionsObj);
   }
 };
-*/
 
 exports.postOrder = (request, response, next) => {
   request.user.addOrder()
