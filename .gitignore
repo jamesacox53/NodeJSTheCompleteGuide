@@ -1,6 +1,7 @@
 # Custom
 mySqlDatabaseCreds.js
 mongoDBCreds.js
+mongooseDBCreds.js
 
 # Logs
 logs
