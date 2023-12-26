@@ -17,7 +17,7 @@ exports.postAddProduct = (request, response, next) => {
     imageURL: request.body.imageURL,
     price: request.body.price,
     description: request.body.description,
-    userID: request.user._id
+    // userID: request.user._id
   };
 
   const product = new Product(productArgsObj);
@@ -31,6 +31,7 @@ exports.postAddProduct = (request, response, next) => {
   }
 };
 
+/*
 exports.getEditProductPage = (request, response, next) => {
   const productID = request.params.productID;
 
@@ -101,3 +102,4 @@ exports.postDeleteProduct = (request, response, next) => {
     response.redirect('/admin/products');
   }
 };
+*/
