@@ -4,7 +4,7 @@ const rootDirectoryStr = path.dirname(require.main.filename);
 const User = require(path.join(rootDirectoryStr, 'models', 'user.js'));
 
 module.exports = (request, response, next) => {
-    User.findById('6586d2c801dc3aa3242fad3c')
+    User.findById('658adc8b6b3c20594cdbac51')
     .then(user => _ifUserDoesntExistThenCreateUser(user))
     .then(user => _addUserToRequest(user, request))
     // .then(err => _getUserCart(request))
@@ -16,7 +16,10 @@ module.exports = (request, response, next) => {
         if (!user) {
             const dummyUserObj = {
                 username: 'James',
-                email: 'test123@gmail.com'
+                email: 'test123@gmail.com',
+                cart: {
+                    items: []
+                }
             };
 
             const dummyUser = new User(dummyUserObj);

@@ -14,7 +14,7 @@ app.set('views', 'views');
 const rootDirectoryStr = path.dirname(require.main.filename);
 const connectionStr = require(path.join(rootDirectoryStr, 'database', 'mongooseDBCreds.js'));
 
-// const userMiddleware = require(path.join(rootDirectoryStr, 'util', 'userMiddleware.js'));
+const userMiddleware = require(path.join(rootDirectoryStr, 'util', 'userMiddleware.js'));
 const adminRoutes = require(path.join(rootDirectoryStr, 'routes', 'adminRoutes.js'));
 const shopRoutes = require(path.join(rootDirectoryStr, 'routes', 'shopRoutes.js'));
 // const errorRoutes = require(path.join(rootDirectoryStr, 'routes', 'errorRoutes.js'));
@@ -22,7 +22,7 @@ const shopRoutes = require(path.join(rootDirectoryStr, 'routes', 'shopRoutes.js'
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(rootDirectoryStr, 'public')));
-// app.use(userMiddleware);
+app.use(userMiddleware);
 app.use(adminRoutes);
 app.use(shopRoutes);
 // app.use(errorRoutes);
