@@ -18,7 +18,6 @@ exports.getProducts = (request, response, next) => {
   }
 };
 
-/*
 exports.getProduct = (request, response, next) => {
   const productID = request.params.productID;
   
@@ -37,7 +36,6 @@ exports.getProduct = (request, response, next) => {
     response.render(path.join('shop', 'product-detail.ejs'), optionsObj);
   }
 };
-*/
 
 exports.getIndex = (request, response, next) => {
   Product.find()
