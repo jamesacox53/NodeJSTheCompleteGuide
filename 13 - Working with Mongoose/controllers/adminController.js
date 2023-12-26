@@ -31,7 +31,6 @@ exports.postAddProduct = (request, response, next) => {
   }
 };
 
-/*
 exports.getEditProductPage = (request, response, next) => {
   const productID = request.params.productID;
 
@@ -64,7 +63,7 @@ exports.postEditProduct = (request, response, next) => {
     product.imageURL = request.body.imageURL;
     product.description = request.body.description;
     product.price = request.body.price;
-    product.userID = request.user._id;
+    // product.userID = request.user._id;
   
     return product.save();
   }
@@ -75,7 +74,7 @@ exports.postEditProduct = (request, response, next) => {
 };
 
 exports.getProducts = (request, response, next) => {
-  Product.fetchAll()
+  Product.find()
   .then(arr => _renderAdminProductsPage(arr))
   .catch(err => console.log(err));
   
@@ -91,6 +90,7 @@ exports.getProducts = (request, response, next) => {
   }
 };
 
+/*
 exports.postDeleteProduct = (request, response, next) => {
   const productID = request.body.productID;
 
