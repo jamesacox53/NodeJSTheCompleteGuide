@@ -3,13 +3,13 @@
 
     <body>
         <%- include(path.join('..', 'includes', 'navigation.ejs')) %>
-        <% if (productsArr.length > 0) { %>    
+        <% if (cart.items.length > 0) { %>    
             <ul>
-                <% for (product of productsArr) { %>
+                <% for (productObj of cart.items) { %>
                     <li>
-                        <p><%= product.product.title %> (<%= product.quantity %>)</p>
+                        <p><%= productObj.productID.title %> (<%= productObj.quantity %>)</p>
                         <form action="/cart-delete-item" method="POST">
-                            <input type="hidden" name="productID" value="<%= product.product._id %>">
+                            <input type="hidden" name="productID" value="<%= productObj.productID._id %>">
                             <button class="btn" type="submit">Delete</button>
                         </form>
                     </li>

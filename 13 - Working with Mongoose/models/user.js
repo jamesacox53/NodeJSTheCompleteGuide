@@ -76,4 +76,9 @@ userSchema.methods._updateProductQuantityInCart = function(_id, productIndex, ca
     return this.save();
 }
 
+userSchema.methods.getCart = function() {
+    return this.populate('cart.items.productID')
+    .then(user => user.cart);
+}
+
 module.exports = mongoose.model('User', userSchema);

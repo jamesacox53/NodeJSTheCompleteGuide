@@ -54,24 +54,22 @@ exports.getIndex = (request, response, next) => {
   }
 };
 
-/*
 exports.getCart = (request, response, next) => {
   request.user.getCart()
-  .then(cartProducts => _renderCartPage(cartProducts))
+  .then(cart => _renderCartPage(cart))
   .catch(err => console.log(err));
   
-  function _renderCartPage(cartProducts) {
+  function _renderCartPage(cart) {
     const optionsObj = {
       path: path,
       pageTitle: 'Your Cart',
       pathStr: '/cart',
-      productsArr: cartProducts
+      cart: cart
     };
     
     response.render(path.join('shop', 'cart.ejs'), optionsObj);
   }
 };
-*/
 
 exports.postCart = (request, response, next) => {
   const productID = request.body.productID;
