@@ -71,6 +71,7 @@ exports.getCart = (request, response, next) => {
     response.render(path.join('shop', 'cart.ejs'), optionsObj);
   }
 };
+*/
 
 exports.postCart = (request, response, next) => {
   const productID = request.body.productID;
@@ -85,6 +86,7 @@ exports.postCart = (request, response, next) => {
   }
 };
 
+/*
 exports.postCartDeleteItem = (request, response, next) => {
   const productID = request.body.productID;
 
