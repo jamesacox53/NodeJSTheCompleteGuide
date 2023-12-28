@@ -84,7 +84,6 @@ exports.postCart = (request, response, next) => {
   }
 };
 
-/*
 exports.postCartDeleteItem = (request, response, next) => {
   const productID = request.body.productID;
 
@@ -97,6 +96,7 @@ exports.postCartDeleteItem = (request, response, next) => {
   }
 };
 
+/*
 exports.getOrders = (request, response, next) => {
   request.user.getOrders()
   .then(ordersArr => _renderOrdersPage(ordersArr))

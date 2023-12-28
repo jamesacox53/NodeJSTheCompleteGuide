@@ -81,4 +81,26 @@ userSchema.methods.getCart = function() {
     .then(user => user.cart);
 }
 
+userSchema.methods.deleteCartItem = function(productID) {
+    this._removeCartItem(this.cart, productID);
+
+    return this.save();
+}
+
+userSchema.methods._removeCartItem = function(cart, productID) {
+    const newItemsArr = [];
+    const items = cart.items;
+    const productIDStr = productID.toString();
+
+    for(let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const itemIDStr = item.productID.toString();
+
+        if (productIDStr != itemIDStr)
+            newItemsArr.push(item);
+    }
+
+    cart.items = newItemsArr;
+}
+
 module.exports = mongoose.model('User', userSchema);
