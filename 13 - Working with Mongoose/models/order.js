@@ -1,18 +1,47 @@
-const path = require('path');
-const Sequelize = require('sequelize');
+const mongoose = require('mongoose');
 
-const rootDirectoryStr = path.dirname(require.main.filename);
-const sequelize = require(path.join(rootDirectoryStr, 'util', 'mySqlDatabaseCreds.js'));
+const Schema = mongoose.Schema;
 
-const orderFieldAttributesObj = {
-    id: {
-        type: Sequelize.INTEGER.UNSIGNED,
-        autoIncrement: true,
-        allowNull: false,
-        primaryKey: true
+const orderSchema = new Schema({
+    products: [
+        {
+            productID: { 
+                type: Object,
+                required: true
+            },
+            quantity: {
+                type: Number,
+                required: true
+            }
+        }
+    ],
+    user: {
+        username: {
+            type: String,
+            required: true
+        },
+        userID: {
+            type: Schema.Types.ObjectId,
+            required: true,
+            ref: 'User'
+        }
     }
-};
+});
 
-const Order = sequelize.define('order', orderFieldAttributesObj);
+orderSchema.statics.getOrderConstructorObj = function(user) {
+    const productsArr = user.cart.items;
 
-module.exports = Order;
+    const userObj = {
+        username: user.username,
+        userID: user._id
+    };
+
+    const orderObj = {
+        products: productsArr,
+        user: userObj
+    };
+
+    return orderObj;
+}
+
+module.exports = mongoose.model('Order', orderSchema);

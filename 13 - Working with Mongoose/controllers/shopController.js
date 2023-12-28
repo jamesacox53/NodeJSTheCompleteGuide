@@ -1,5 +1,6 @@
 const path = require('path');
 const Product = require(path.join('..', 'models', 'product.js'));
+const Order = require(path.join('..', 'models', 'order.js'));
 
 exports.getProducts = (request, response, next) => {
   Product.find()
@@ -113,17 +114,27 @@ exports.getOrders = (request, response, next) => {
     response.render(path.join('shop', 'orders.ejs'), optionsObj);
   }
 };
+*/
 
 exports.postOrder = (request, response, next) => {
-  request.user.addOrder()
+  request.user.populate('cart.items.productID')
+  .then(user => _createOrder(user))
   .then(err => _redirectToOrdersPage(response))
   .catch(err => console.log(err));
+
+  function _createOrder(user) {
+    const orderObj = Order.getOrderConstructorObj(user);
+    
+    const order = new Order(orderObj);
+    return order.save();
+  }
 
   function _redirectToOrdersPage(response) {
     response.redirect('/orders');
   }
 };
 
+/*
 exports.getCheckout = (request, response, next) => {
   Product.findAll()
   .then(arr => _getProducts(arr, response))
