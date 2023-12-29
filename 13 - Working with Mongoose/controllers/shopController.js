@@ -119,6 +119,7 @@ exports.getOrders = (request, response, next) => {
 exports.postOrder = (request, response, next) => {
   request.user.populate('cart.items.productID')
   .then(user => _createOrder(user))
+  .then(order => request.user.clearCart())
   .then(err => _redirectToOrdersPage(response))
   .catch(err => console.log(err));
 
