@@ -10,8 +10,8 @@
                         <li>
                             <h1># <%= orderObj._id.toString() %></h1>
                             <ul>
-                                <% for (cartObj of orderObj.cart) { %>
-                                    <li><%= cartObj.product.title %> (<%= cartObj.quantity %>)</li>
+                                <% for (cartObj of orderObj.products) { %>
+                                    <li><%= cartObj.productID.title %> (<%= cartObj.quantity %>)</li>
                                  <% } %>
                             </ul>
                         </li>

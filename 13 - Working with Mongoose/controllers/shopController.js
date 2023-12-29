@@ -97,9 +97,8 @@ exports.postCartDeleteItem = (request, response, next) => {
   }
 };
 
-/*
 exports.getOrders = (request, response, next) => {
-  request.user.getOrders()
+  Order.find({ 'user.userID': request.user._id })
   .then(ordersArr => _renderOrdersPage(ordersArr))
   .catch(err => console.log(err))
   
@@ -114,7 +113,6 @@ exports.getOrders = (request, response, next) => {
     response.render(path.join('shop', 'orders.ejs'), optionsObj);
   }
 };
-*/
 
 exports.postOrder = (request, response, next) => {
   request.user.populate('cart.items.productID')
