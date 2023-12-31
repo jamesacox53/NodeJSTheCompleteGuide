@@ -4,7 +4,6 @@ const path = require('path');
 
 // 3rd Party
 const express = require('express');
-const expressSession = require('express-session');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
@@ -14,7 +13,7 @@ app.set('views', 'views');
 
 const rootDirectoryStr = path.dirname(require.main.filename);
 const connectionStr = require(path.join(rootDirectoryStr, 'database', 'mongooseDBCreds.js'));
-const sessionArgsObj = require(path.join(rootDirectoryStr, 'sessions', 'expressSessionCreds.js'));
+const expressSession = require(path.join(rootDirectoryStr, 'sessions', 'expressSessionCreds.js'));
 
 const userMiddleware = require(path.join(rootDirectoryStr, 'util', 'userMiddleware.js'));
 const adminRoutes = require(path.join(rootDirectoryStr, 'routes', 'adminRoutes.js'));
@@ -24,7 +23,7 @@ const errorRoutes = require(path.join(rootDirectoryStr, 'routes', 'errorRoutes.j
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(rootDirectoryStr, 'public')));
-app.use(expressSession(sessionArgsObj));
+app.use(expressSession);
 
 app.use(userMiddleware);
 app.use(adminRoutes);

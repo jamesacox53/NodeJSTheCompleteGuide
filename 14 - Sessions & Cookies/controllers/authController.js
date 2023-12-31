@@ -11,5 +11,6 @@ exports.getLoginPage = (request, response, next) => {
 };
 
 exports.postLogin = (request, response, next) => {
+  request.session.isLoggedIn = true;
   response.redirect('/');
 };
