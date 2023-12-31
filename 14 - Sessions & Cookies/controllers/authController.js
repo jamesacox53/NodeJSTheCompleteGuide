@@ -9,3 +9,7 @@ exports.getLoginPage = (request, response, next) => {
    
   response.render(path.join('auth', 'login.ejs'), optionsObj);
 };
+
+exports.postLogin = (request, response, next) => {
+  response.redirect('/');
+};
