@@ -4,8 +4,12 @@ const rootDirectoryStr = path.dirname(require.main.filename);
 const User = require(path.join(rootDirectoryStr, 'models', 'user.js'));
 
 module.exports = (request, response, next) => {
-    User.findById('658adc8b6b3c20594cdbac51')
-    .then(user => _ifUserDoesntExistThenCreateUser(user))
+    if (!request.session.user) {
+        return next();
+    }
+    
+    User.findById(request.session.user._id)
+    // .then(user => _ifUserDoesntExistThenCreateUser(user))
     .then(user => _addUserToRequest(user, request))
     // .then(err => _getUserCart(request))
     // .then(cart => _createCartForUserIfDoesntExist(cart, request))

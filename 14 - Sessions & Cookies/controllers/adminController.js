@@ -18,7 +18,7 @@ exports.postAddProduct = (request, response, next) => {
     imageURL: request.body.imageURL,
     price: request.body.price,
     description: request.body.description,
-    userID: request.session.user._id
+    userID: request.user._id
   };
 
   const product = new Product(productArgsObj);
@@ -65,7 +65,7 @@ exports.postEditProduct = (request, response, next) => {
     product.imageURL = request.body.imageURL;
     product.description = request.body.description;
     product.price = request.body.price;
-    product.userID = request.session.user._id;
+    product.userID = request.user._id;
   
     return product.save();
   }
