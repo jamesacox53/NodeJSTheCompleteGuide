@@ -20,15 +20,13 @@ exports.postLogin = (request, response, next) => {
   // User.findOne({ 'email': emailStr })
   User.findById('658adc8b6b3c20594cdbac51')
   .then(user => _storeUserInSession(user, request))
-  .then(err => _redirectToRoot(response));
 
   function _storeUserInSession(user, request) {
     request.session.user = user;
     request.session.isAuthenticated = true;
-  }
-  
-  function _redirectToRoot(response) {
-    response.redirect('/');
+    return request.session.save((err) => {
+      response.redirect('/');
+    });
   }
 };
 
