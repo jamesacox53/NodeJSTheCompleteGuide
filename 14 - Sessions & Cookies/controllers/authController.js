@@ -30,3 +30,9 @@ exports.postLogin = (request, response, next) => {
     response.redirect('/');
   }
 };
+
+exports.postLogout = (request, response, next) => {
+  request.session.destroy(() => {
+    response.redirect('/');
+  })
+};
