@@ -56,7 +56,7 @@ exports.getIndex = (request, response, next) => {
 };
 
 exports.getCart = (request, response, next) => {
-  request.user.getCart()
+  request.session.user.getCart()
   .then(cart => _renderCartPage(cart))
   .catch(err => console.log(err));
   
@@ -76,7 +76,7 @@ exports.postCart = (request, response, next) => {
   const productID = request.body.productID;
   
   Product.findById(productID)
-  .then(product => request.user.addToCart(product))
+  .then(product => request.session.user.addToCart(product))
   .then(err => _redirectToCartPage(response))
   .catch(err => console.log(err));
 
@@ -88,7 +88,7 @@ exports.postCart = (request, response, next) => {
 exports.postCartDeleteItem = (request, response, next) => {
   const productID = request.body.productID;
 
-  request.user.deleteCartItem(productID)
+  request.session.user.deleteCartItem(productID)
   .then(err => _redirectToCart(response))
   .catch(err => console.log(err));
 
@@ -98,7 +98,7 @@ exports.postCartDeleteItem = (request, response, next) => {
 };
 
 exports.getOrders = (request, response, next) => {
-  Order.find({ 'user.userID': request.user._id })
+  Order.find({ 'user.userID': request.session.user._id })
   .then(ordersArr => _renderOrdersPage(ordersArr))
   .catch(err => console.log(err))
   
@@ -115,9 +115,9 @@ exports.getOrders = (request, response, next) => {
 };
 
 exports.postOrder = (request, response, next) => {
-  request.user.populate('cart.items.productID')
+  request.session.user.populate('cart.items.productID')
   .then(user => _createOrder(user))
-  .then(order => request.user.clearCart())
+  .then(order => request.session.user.clearCart())
   .then(err => _redirectToOrdersPage(response))
   .catch(err => console.log(err));
 
