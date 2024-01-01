@@ -9,13 +9,15 @@
             <li class="main-header__item">
                 <a class="<%= pathStr === '/products' ? 'active' : '' %>" href="/products">Products</a>
             </li>
+            <% if (isAuthenticated) { %>
+
             <li class="main-header__item">
                 <a class="<%= pathStr === '/cart' ? 'active' : '' %>" href="/cart">Cart</a>
             </li>
             <li class="main-header__item">
                 <a class="<%= pathStr === '/orders' ? 'active' : '' %>" href="/orders">Orders</a>
             </li>
-            <!--
+            
             <li class="main-header__item">
                 <a class="<%= pathStr === '/admin/add-product' ? 'active' : '' %>" href="/admin/add-product">Add Product
                 </a>
@@ -24,17 +26,20 @@
                 <a class="<%= pathStr === '/admin/products' ? 'active' : '' %>" href="/admin/products">Admin Products
                 </a>
             </li>
-            -->
+            <% } %>
         </ul>
         <ul class="main-header__item-list">
+            <% if (!isAuthenticated) { %>
             <li class="main-header__item">
                 <a class="<%= pathStr === '/login' ? 'active' : '' %>" href="/login">Login</a>
             </li>
+            <% } else { %>
             <li class="main-header__item">
                 <form action="/logout" method="POST">
                     <button type="submit">Logout</button>
                 </form>
             </li>
+            <% } %>
         </ul>
     </nav>
 </header>

@@ -7,7 +7,8 @@ exports.getLoginPage = (request, response, next) => {
   const optionsObj = {
     path: path,
     pageTitle: 'Login',
-    pathStr: '/login'
+    pathStr: '/login',
+    isAuthenticated: request.session.isAuthenticated
   };
    
   response.render(path.join('auth', 'login.ejs'), optionsObj);
@@ -23,7 +24,7 @@ exports.postLogin = (request, response, next) => {
 
   function _storeUserInSession(user, request) {
     request.session.user = user;
-    request.session.isLoggedIn = true;
+    request.session.isAuthenticated = true;
   }
   
   function _redirectToRoot(response) {
