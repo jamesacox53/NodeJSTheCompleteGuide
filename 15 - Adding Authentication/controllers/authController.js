@@ -1,4 +1,6 @@
 const path = require('path');
+const bcryptjs = require('bcryptjs');
+const { sign } = require('crypto');
 
 const rootDirectoryStr = path.dirname(require.main.filename);
 const User = require(path.join(rootDirectoryStr, 'models', 'user.js'));
@@ -30,19 +32,17 @@ exports.postLogin = (request, response, next) => {
   
   // User.findById('658adc8b6b3c20594cdbac51')
   User.findOne({ 'email': emailStr })
-  .then(user => _ifUserDoesntExistGotoSignupPage(user, response))
-  .then(user => _storeUserInSession(user, request, response));
-
-  function _ifUserDoesntExistGotoSignupPage(user, response) {
-    if (!user)
+  .then(user => _postLogin(user, request, response))
+  
+  function _postLogin(user, request, response) {
+    if (!user) {
       response.redirect('/signup');
+    }
 
-      return user;
+    return _storeUserInSession(user, request, response);
   }
 
   function _storeUserInSession(user, request, response) {
-    if (!user) return;
-    
     request.session.user = user;
     request.session.isAuthenticated = true;
     return request.session.save((err) => {
@@ -59,26 +59,30 @@ exports.postSignup = (request, response, next) => {
   };
   
   User.findOne({ email: signupObj.emailStr })
-  .then(user => _ifUserExistsGotoSignupPage(user, response))
-  .then(redirected => _createUser(redirected, signupObj))
-  .then(user => _storeUserInSession(user, request, response))
+  .then(user => _postSignup(user, signupObj, request, response))
   .catch(err => console.log(err));
 
-  function _ifUserExistsGotoSignupPage(user, response) {
+  function _postSignup(user, signupObj, request, response) {
     if (user) {
-      response.redirect('/signup');
-      return true;
+      return response.redirect('/signup');
     }
 
-    return false;
+    return _getHashedPassword(signupObj)
+    .then(hashedPasswordStr => _createUser(hashedPasswordStr, signupObj))
+    .then(user => _storeUserInSession(user, request, response))
+    .catch(err => console.log(err));
   }
 
-  function _createUser(redirected, signupObj) {
-    if (redirected) return;
+  function _getHashedPassword(signupObj) {
+    const passwordStr = signupObj.passwordStr;
 
+    return bcryptjs.hash(passwordStr, 12);
+  }
+
+  function _createUser(hashedPasswordStr, signupObj) {
     const user = new User({
       email: signupObj.emailStr,
-      password: signupObj.passwordStr,
+      password: hashedPasswordStr,
       cart: {
         items: []
       }
@@ -88,8 +92,6 @@ exports.postSignup = (request, response, next) => {
   }
 
   function _storeUserInSession(user, request, response) {
-    if (!user) return;
-
     request.session.user = user;
     request.session.isAuthenticated = true;
     return request.session.save((err) => {
