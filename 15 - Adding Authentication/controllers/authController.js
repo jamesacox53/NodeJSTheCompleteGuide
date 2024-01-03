@@ -1,6 +1,5 @@
 const path = require('path');
 const bcryptjs = require('bcryptjs');
-const { sign } = require('crypto');
 
 const rootDirectoryStr = path.dirname(require.main.filename);
 const User = require(path.join(rootDirectoryStr, 'models', 'user.js'));
@@ -28,17 +27,35 @@ exports.getSignupPage = (request, response, next) => {
 };
 
 exports.postLogin = (request, response, next) => {
-  const emailStr = request.body.email;
+  const loginObj = {
+    emailStr: request.body.email,
+    passwordStr: request.body.password
+  };
   
-  // User.findById('658adc8b6b3c20594cdbac51')
-  User.findOne({ 'email': emailStr })
-  .then(user => _postLogin(user, request, response))
+  User.findOne({ 'email': loginObj.emailStr })
+  .then(user => _postLogin(user, loginObj, request, response))
   
-  function _postLogin(user, request, response) {
+  function _postLogin(user, loginObj, request, response) {
     if (!user) {
-      response.redirect('/signup');
+      return response.redirect('/signup');
     }
 
+    return _isCorrectPassword(user, loginObj)
+    .then(isCorrect => _loginOrRedirect(isCorrect, user, request, response));
+  }
+
+  function _isCorrectPassword(user, loginObj) {
+    const userPasswordHashStr = user.password;
+    const loginPasswordStr = loginObj.passwordStr;
+
+    return bcryptjs.compare(loginPasswordStr, userPasswordHashStr);
+  }
+
+  function _loginOrRedirect(isCorrect, user, request, response) {
+    if (!isCorrect) {
+      return response.redirect('/login');
+    }
+    
     return _storeUserInSession(user, request, response);
   }
 
