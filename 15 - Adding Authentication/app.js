@@ -14,7 +14,7 @@ app.set('views', 'views');
 const rootDirectoryStr = path.dirname(require.main.filename);
 const connectionStr = require(path.join(rootDirectoryStr, 'database', 'mongooseDBCreds.js'));
 const expressSession = require(path.join(rootDirectoryStr, 'sessions', 'expressSessionCreds.js'));
-const userMiddleware = require(path.join(rootDirectoryStr, 'util', 'userMiddleware.js'));
+const userMiddleware = require(path.join(rootDirectoryStr, 'middleware', 'userMiddleware.js'));
 
 const adminRoutes = require(path.join(rootDirectoryStr, 'routes', 'adminRoutes.js'));
 const authRoutes = require(path.join(rootDirectoryStr, 'routes', 'authRoutes.js'));

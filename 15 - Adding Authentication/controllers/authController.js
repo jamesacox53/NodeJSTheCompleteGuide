@@ -62,6 +62,7 @@ exports.postLogin = (request, response, next) => {
   function _storeUserInSession(user, request, response) {
     request.session.user = user;
     request.session.isAuthenticated = true;
+    request.session.isLoggedIn = true;
     return request.session.save((err) => {
       response.redirect('/');
     });
@@ -111,6 +112,7 @@ exports.postSignup = (request, response, next) => {
   function _storeUserInSession(user, request, response) {
     request.session.user = user;
     request.session.isAuthenticated = true;
+    request.session.isLoggedIn = true;
     return request.session.save((err) => {
       response.redirect('/');
     });
