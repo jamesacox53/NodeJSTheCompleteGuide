@@ -16,7 +16,7 @@ const orderSchema = new Schema({
         }
     ],
     user: {
-        username: {
+        email: {
             type: String,
             required: true
         },
@@ -32,7 +32,7 @@ orderSchema.statics.getOrderConstructorObj = function(user) {
     const productsArr = user.cart.items;
 
     const userObj = {
-        username: user.username,
+        email: user.email,
         userID: user._id
     };
 
