@@ -6,24 +6,32 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-
-const app = express();
-app.set('view engine', 'ejs');
-app.set('views', 'views');
+const { csrfSync } = require("csrf-sync");
 
 const rootDirectoryStr = path.dirname(require.main.filename);
 const connectionStr = require(path.join(rootDirectoryStr, 'database', 'mongooseDBCreds.js'));
 const expressSession = require(path.join(rootDirectoryStr, 'sessions', 'expressSessionCreds.js'));
 const userMiddleware = require(path.join(rootDirectoryStr, 'middleware', 'userMiddleware.js'));
+const addViewRenderVariables = require(path.join(rootDirectoryStr, 'middleware', 'addViewRenderVariables.js'));
+const csrfSyncOptionsObj = require(path.join(rootDirectoryStr, 'sensitive', 'csrfSyncOptionsObj.js'));
 
 const adminRoutes = require(path.join(rootDirectoryStr, 'routes', 'adminRoutes.js'));
 const authRoutes = require(path.join(rootDirectoryStr, 'routes', 'authRoutes.js'));
 const shopRoutes = require(path.join(rootDirectoryStr, 'routes', 'shopRoutes.js'));
 const errorRoutes = require(path.join(rootDirectoryStr, 'routes', 'errorRoutes.js'));
 
+const { csrfSynchronisedProtection } = csrfSync(csrfSyncOptionsObj);
+
+const app = express();
+app.set('view engine', 'ejs');
+app.set('views', 'views');
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(rootDirectoryStr, 'public')));
 app.use(expressSession);
+app.use(csrfSynchronisedProtection);
+
+app.use(addViewRenderVariables);
 app.use(userMiddleware);
 
 app.use(adminRoutes);

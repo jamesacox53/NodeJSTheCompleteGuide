@@ -3,6 +3,8 @@ mySqlDatabaseCreds.js
 mongoDBCreds.js
 mongooseDBCreds.js
 expressSessionCreds.js
+cookieSecretStr.js
+csrfSyncOptionsObj.js
 
 # Logs
 logs
