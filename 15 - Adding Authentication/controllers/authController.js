@@ -9,10 +9,19 @@ exports.getLoginPage = (request, response, next) => {
     path: path,
     pageTitle: 'Login',
     pathStr: '/login',
-    userDoesntExistErr: request.flash('userDoesntExistErr')[0]
+    userDoesntExistErr: _getErrorMsg('userDoesntExistErr', request)
   };
    
   response.render(path.join('auth', 'login.ejs'), optionsObj);
+
+  function _getErrorMsg(errorKey, request) {
+    if (!errorKey || !request) return null;
+
+    const errorArr = request.flash(errorKey);
+    if(errorArr.length < 1) return null;
+
+    return errorArr[0];
+  }
 };
 
 exports.getSignupPage = (request, response, next) => {
