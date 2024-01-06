@@ -28,10 +28,20 @@ exports.getSignupPage = (request, response, next) => {
   const optionsObj = {
     path: path,
     pageTitle: 'Sign Up',
-    pathStr: '/signup'
+    pathStr: '/signup',
+    userAlreadyExistErr: _getErrorMsg('userAlreadyExistErr', request)
   };
    
   response.render(path.join('auth', 'signup.ejs'), optionsObj);
+
+  function _getErrorMsg(errorKey, request) {
+    if (!errorKey || !request) return null;
+
+    const errorArr = request.flash(errorKey);
+    if(errorArr.length < 1) return null;
+
+    return errorArr[0];
+  }
 };
 
 exports.postLogin = (request, response, next) => {
@@ -92,6 +102,7 @@ exports.postSignup = (request, response, next) => {
 
   function _postSignup(user, signupObj, request, response) {
     if (user) {
+      request.flash('userAlreadyExistErr', 'Email Address already exists');
       return response.redirect('/signup');
     }
 
