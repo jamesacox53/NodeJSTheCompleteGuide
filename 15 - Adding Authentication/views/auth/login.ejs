@@ -7,6 +7,9 @@
    <%- include(path.join('..', 'includes', 'navigation.ejs')) %>
 
     <main>
+        <% if (userDoesntExistErr) { %>
+            <div><%= userDoesntExistErr %></div>
+        <% } %>
         <form class="login-form" action="/login" method="POST">
             <div class="form-control">
                 <label for="email">E-Mail</label>

@@ -9,7 +9,7 @@ exports.getLoginPage = (request, response, next) => {
     path: path,
     pageTitle: 'Login',
     pathStr: '/login',
-    isAuthenticated: request.session.isAuthenticated
+    userDoesntExistErr: request.flash('userDoesntExistErr')[0]
   };
    
   response.render(path.join('auth', 'login.ejs'), optionsObj);
@@ -19,8 +19,7 @@ exports.getSignupPage = (request, response, next) => {
   const optionsObj = {
     path: path,
     pageTitle: 'Sign Up',
-    pathStr: '/signup',
-    isAuthenticated: request.session.isAuthenticated
+    pathStr: '/signup'
   };
    
   response.render(path.join('auth', 'signup.ejs'), optionsObj);
@@ -37,7 +36,8 @@ exports.postLogin = (request, response, next) => {
   
   function _postLogin(user, loginObj, request, response) {
     if (!user) {
-      return response.redirect('/signup');
+      request.flash('userDoesntExistErr', 'Invalid Email Address or Password');
+      return response.redirect('/login');
     }
 
     return _isCorrectPassword(user, loginObj)
@@ -53,6 +53,7 @@ exports.postLogin = (request, response, next) => {
 
   function _loginOrRedirect(isCorrect, user, request, response) {
     if (!isCorrect) {
+      request.flash('userDoesntExistErr', 'Invalid Email Address or Password');
       return response.redirect('/login');
     }
     

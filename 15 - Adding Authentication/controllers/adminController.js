@@ -5,8 +5,7 @@ exports.getAddProductPage = (request, response, next) => {
   const optionsObj = {
     path: path,
     pageTitle: 'Add Product',
-    pathStr: '/admin/add-product',
-    isAuthenticated: request.session.isAuthenticated
+    pathStr: '/admin/add-product'
   };
    
   response.render(path.join('admin', 'add-product.ejs'), optionsObj);
@@ -44,8 +43,7 @@ exports.getEditProductPage = (request, response, next) => {
       path: path,
       pageTitle: 'Edit Product',
       pathStr: '/admin/edit-product',
-      product: product,
-      isAuthenticated: request.session.isAuthenticated
+      product: product
     };
 
     response.render(path.join('admin', 'edit-product.ejs'), optionsObj);
@@ -85,8 +83,7 @@ exports.getProducts = (request, response, next) => {
       path: path,
       pageTitle: 'Admin Products',
       pathStr: '/admin/products',
-      prods: arr,
-      isAuthenticated: request.session.isAuthenticated
+      prods: arr
     };
   
     response.render(path.join('admin', 'products.ejs'), optionsObj);

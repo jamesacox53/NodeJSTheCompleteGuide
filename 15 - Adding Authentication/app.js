@@ -6,7 +6,8 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const { csrfSync } = require("csrf-sync");
+const { csrfSync } = require('csrf-sync');
+const connectFlash = require('connect-flash');
 
 const rootDirectoryStr = path.dirname(require.main.filename);
 const connectionStr = require(path.join(rootDirectoryStr, 'database', 'mongooseDBCreds.js'));
@@ -31,6 +32,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(rootDirectoryStr, 'public')));
 app.use(expressSession);
 app.use(csrfSynchronisedProtection);
+app.use(connectFlash());
 
 app.use(addViewRenderVariables);
 app.use(userMiddleware);

@@ -12,8 +12,7 @@ exports.getProducts = (request, response, next) => {
       path: path,
       pageTitle: 'All Products',
       pathStr: '/products',
-      prods: arr,
-      isAuthenticated: request.session.isAuthenticated
+      prods: arr
     };
   
     response.render(path.join('shop', 'product-list.ejs'), optionsObj);
@@ -32,8 +31,7 @@ exports.getProduct = (request, response, next) => {
       path: path,
       pageTitle: product.title,
       pathStr: '/products',
-      product: product,
-      isAuthenticated: request.session.isAuthenticated
+      product: product
     };
 
     response.render(path.join('shop', 'product-detail.ejs'), optionsObj);
@@ -50,8 +48,7 @@ exports.getIndex = (request, response, next) => {
       path: path,
       pageTitle: 'Shop',
       pathStr: '/',
-      prods: arr,
-      isAuthenticated: request.session.isAuthenticated
+      prods: arr
     };
   
     response.render(path.join('shop', 'index.ejs'), optionsObj);
@@ -68,8 +65,7 @@ exports.getCart = (request, response, next) => {
       path: path,
       pageTitle: 'Your Cart',
       pathStr: '/cart',
-      cart: cart,
-      isAuthenticated: request.session.isAuthenticated
+      cart: cart
     };
     
     response.render(path.join('shop', 'cart.ejs'), optionsObj);
@@ -111,8 +107,7 @@ exports.getOrders = (request, response, next) => {
       path: path,
       pageTitle: 'Your Orders',
       pathStr: '/orders',
-      ordersArr: ordersArr,
-      isAuthenticated: request.session.isAuthenticated
+      ordersArr: ordersArr
     };
   
     response.render(path.join('shop', 'orders.ejs'), optionsObj);

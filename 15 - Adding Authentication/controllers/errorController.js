@@ -4,8 +4,7 @@ exports.getError404Page = (request, response, next) => {
     var optionsObj = {
         path: path,
         pageTitle: 'Page Not Found',
-        pathStr: '404',
-        isAuthenticated: request.session.isAuthenticated
+        pathStr: '404'
     };
 
     response.status(404).render(path.join('error', '404.ejs'), optionsObj);
