@@ -8,7 +8,7 @@
 
     <main>
         <% if (userDoesntExistErr) { %>
-            <div><%= userDoesntExistErr %></div>
+            <div class="user-message user-message--error"><%= userDoesntExistErr %></div>
         <% } %>
         <form class="login-form" action="/login" method="POST">
             <div class="form-control">
