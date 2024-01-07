@@ -5,6 +5,8 @@ mongooseDBCreds.js
 expressSessionCreds.js
 cookieSecretStr.js
 csrfSyncOptionsObj.js
+expressSessionSecretStr.js
+mongooseDBConnectionStr.js
 
 # Logs
 logs

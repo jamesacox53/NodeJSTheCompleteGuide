@@ -10,9 +10,9 @@ const { csrfSync } = require('csrf-sync');
 const connectFlash = require('connect-flash');
 
 const rootDirectoryStr = path.dirname(require.main.filename);
-const connectionStr = require(path.join(rootDirectoryStr, 'database', 'mongooseDBCreds.js'));
-const expressSession = require(path.join(rootDirectoryStr, 'sessions', 'expressSessionCreds.js'));
-const csrfSyncOptionsObj = require(path.join(rootDirectoryStr, 'sensitive', 'csrfSyncOptionsObj.js'));
+const connectionStr = require(path.join(rootDirectoryStr, 'sensitive', 'mongooseDBConnectionStr.js'));
+const expressSession = require(path.join(rootDirectoryStr, 'sessions', 'expressSession.js'));
+const csrfSyncOptionsObj = require(path.join(rootDirectoryStr, 'csrf', 'csrfSyncObj.js'));
 
 const addViewRenderVariables = require(path.join(rootDirectoryStr, 'middleware', 'addViewRenderVariables.js'));
 const userMiddleware = require(path.join(rootDirectoryStr, 'middleware', 'userMiddleware.js'));
