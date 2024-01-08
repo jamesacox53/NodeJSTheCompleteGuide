@@ -168,3 +168,23 @@ exports.postLogout = (request, response, next) => {
     response.redirect('/');
   })
 };
+
+exports.getResetPage = (request, response, next) => {
+  const optionsObj = {
+    path: path,
+    pageTitle: 'Reset Password',
+    pathStr: '/reset',
+    userDoesntExistErr: _getErrorMsg('userDoesntExistErr', request)
+  };
+   
+  response.render(path.join('auth', 'reset.ejs'), optionsObj);
+
+  function _getErrorMsg(errorKey, request) {
+    if (!errorKey || !request) return null;
+
+    const errorArr = request.flash(errorKey);
+    if(errorArr.length < 1) return null;
+
+    return errorArr[0];
+  }
+};
