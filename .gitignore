@@ -7,6 +7,8 @@ cookieSecretStr.js
 csrfSyncOptionsObj.js
 expressSessionSecretStr.js
 mongooseDBConnectionStr.js
+gmailCredsObj.js
+testEmailAccsObj.js
 
 # Logs
 logs

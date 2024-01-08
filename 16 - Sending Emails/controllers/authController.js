@@ -1,8 +1,16 @@
 const path = require('path');
 const bcryptjs = require('bcryptjs');
+const nodemailer = require('nodemailer');
 
 const rootDirectoryStr = path.dirname(require.main.filename);
 const User = require(path.join(rootDirectoryStr, 'models', 'user.js'));
+const gmailCredsObj = require(path.join(rootDirectoryStr, 'sensitive', 'gmailCredsObj.js'));
+const testEmailAccsObj = require(path.join(rootDirectoryStr, 'sensitive', 'testEmailAccsObj.js'));
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: gmailCredsObj
+});
 
 exports.getLoginPage = (request, response, next) => {
   const optionsObj = {
@@ -108,6 +116,7 @@ exports.postSignup = (request, response, next) => {
 
     return _getHashedPassword(signupObj)
     .then(hashedPasswordStr => _createUser(hashedPasswordStr, signupObj))
+    .then(user => _sendSignupEmail(user))
     .then(user => _storeUserInSession(user, request, response))
     .catch(err => console.log(err));
   }
@@ -128,6 +137,20 @@ exports.postSignup = (request, response, next) => {
     });
     
     return user.save();
+  }
+
+  function _sendSignupEmail(user) {
+    const mailOptions = {
+      from: testEmailAccsObj.from,
+      to: testEmailAccsObj.to,
+      subject: "Hello from Nodemailer",
+      text: "You have successfully signed up.",
+      html: "<h1>You have successfully signed up.</h1>"
+    };
+
+    transporter.sendMail(mailOptions);
+
+    return user;
   }
 
   function _storeUserInSession(user, request, response) {
