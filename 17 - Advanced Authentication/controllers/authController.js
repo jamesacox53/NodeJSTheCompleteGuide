@@ -204,30 +204,68 @@ exports.postReset = (request, response, next) => {
     return User.findOne({ email: emailStr })
     .then(user => _setResetToken(user, token, request, response))
     .catch(err => console.log(err));
+  }
+
+  function _setResetToken(user, token, request, response) {
+    if (!user) {
+      request.flash('userDoesntExistErr', "The user doesn't exist");
+      return response.redirect('/reset');
     }
 
-    function _setResetToken(user, token, request, response) {
-      if (!user) {
-        request.flash('userDoesntExistErr', "The user doesn't exist");
-        return response.redirect('/reset');
-      }
+    user.resetToken = token;
+    user.resetTokenExpiration = Date.now() + 360000;
+    return user.save()
+    .then(user => _sendResetEmail(user, response));
+  }
 
-      user.resetToken = token;
-      user.resetTokenExpiration = Date.now() + 360000;
-      return user.save()
-      .then(user => _sendResetEmail(user, response));
-    }
-
-    function _sendResetEmail(user, response) {
-      const mailOptions = {
-        from: testEmailAccsObj.from,
-        to: testEmailAccsObj.to,
-        subject: "Password Reset",
-        html: `<p>You requested a password reset</p>
-        <p>Click this <a href="http://localhost:3000/reset/${user.resetToken}">link</a> to set a new password</p>`
-      };
+  function _sendResetEmail(user, response) {
+    const mailOptions = {
+      from: testEmailAccsObj.from,
+      to: testEmailAccsObj.to,
+      subject: "Password Reset",
+      html: `<p>You requested a password reset</p>
+      <p>Click this <a href="http://localhost:3000/reset/${user.resetToken}">link</a> to set a new password</p>`
+    };
   
-      transporter.sendMail(mailOptions);
+    transporter.sendMail(mailOptions);
+    return response.redirect('/');
+  }
+};
+
+exports.getResetPasswordPage = (request, response, next) => {
+  const token = request.params.token;
+  const whereObj = {
+    resetToken: token,
+    resetTokenExpiration: {
+      $gt: Date.now()
+    }
+  };
+
+  User.findOne(whereObj)
+  .then(user => _getResetPasswordPage(user, response))
+  .catch(err => console.log(err));
+
+  function _getResetPasswordPage(user, response) {
+    if (!user) {
       return response.redirect('/');
     }
+
+    const optionsObj = {
+      path: path,
+      pageTitle: 'Reset Password',
+      pathStr: '/reset',
+      userID: user._id.toString()
+    };
+     
+    response.render(path.join('auth', 'reset-password.ejs'), optionsObj);
+  }
+
+  function _getErrorMsg(errorKey, request) {
+    if (!errorKey || !request) return null;
+
+    const errorArr = request.flash(errorKey);
+    if(errorArr.length < 1) return null;
+
+    return errorArr[0];
+  }
 };
