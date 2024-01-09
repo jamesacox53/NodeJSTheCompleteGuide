@@ -1,6 +1,7 @@
 const path = require('path');
 const bcryptjs = require('bcryptjs');
 const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 const rootDirectoryStr = path.dirname(require.main.filename);
 const User = require(path.join(rootDirectoryStr, 'models', 'user.js'));
@@ -144,7 +145,6 @@ exports.postSignup = (request, response, next) => {
       from: testEmailAccsObj.from,
       to: testEmailAccsObj.to,
       subject: "Hello from Nodemailer",
-      text: "You have successfully signed up.",
       html: "<h1>You have successfully signed up.</h1>"
     };
 
@@ -187,4 +187,47 @@ exports.getResetPage = (request, response, next) => {
 
     return errorArr[0];
   }
+};
+
+exports.postReset = (request, response, next) => {
+  crypto.randomBytes(32, (err, buffer) => _postReset(err, buffer, request, response));
+
+  function _postReset(err, buffer, request, response) {
+    if (err) {
+      return response.redirect('/reset');
+    }
+
+    const token = buffer.toString('hex');
+    const emailStr = request.body.email;
+    if (!emailStr) return;
+
+    return User.findOne({ email: emailStr })
+    .then(user => _setResetToken(user, token, request, response))
+    .catch(err => console.log(err));
+    }
+
+    function _setResetToken(user, token, request, response) {
+      if (!user) {
+        request.flash('userDoesntExistErr', "The user doesn't exist");
+        return response.redirect('/reset');
+      }
+
+      user.resetToken = token;
+      user.resetTokenExpiration = Date.now() + 360000;
+      return user.save()
+      .then(user => _sendResetEmail(user, response));
+    }
+
+    function _sendResetEmail(user, response) {
+      const mailOptions = {
+        from: testEmailAccsObj.from,
+        to: testEmailAccsObj.to,
+        subject: "Password Reset",
+        html: `<p>You requested a password reset</p>
+        <p>Click this <a href="http://localhost:3000/reset/${user.resetToken}">link</a> to set a new password</p>`
+      };
+  
+      transporter.sendMail(mailOptions);
+      return response.redirect('/');
+    }
 };
