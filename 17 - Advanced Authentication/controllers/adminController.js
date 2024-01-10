@@ -57,7 +57,7 @@ exports.postEditProduct = (request, response, next) => {
   .then(product => _ifProductIsCreatedByUserThenEdit(product, request, response))
   
   function _ifProductIsCreatedByUserThenEdit(product, request, response) {
-    if (product.userID !== request.user._id) {
+    if (product.userID.toString() !== request.user._id.toString()) {
       return response.redirect('/');
     }
 
