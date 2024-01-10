@@ -54,10 +54,18 @@ exports.postEditProduct = (request, response, next) => {
   const productID = request.body.productID;
   
   Product.findById(productID)
-  .then(product => _editProductAndSave(product, request))
-  .then(err => _gotoAdminProductPage(err, response))
-  .catch(err => console.log(err));
+  .then(product => _ifProductIsCreatedByUserThenEdit(product, request, response))
   
+  function _ifProductIsCreatedByUserThenEdit(product, request, response) {
+    if (product.userID !== request.user._id) {
+      return response.redirect('/');
+    }
+
+    return _editProductAndSave(product, request)
+    .then(err => _gotoAdminProductPage(err, response))
+    .catch(err => console.log(err));
+  }
+
   function _editProductAndSave(product, request) {
     product.title = request.body.title;
     product.imageURL = request.body.imageURL;
@@ -91,9 +99,12 @@ exports.getProducts = (request, response, next) => {
 };
 
 exports.postDeleteProduct = (request, response, next) => {
-  const productID = request.body.productID;
-
-  Product.findOneAndDelete(productID)
+  const whereObj = {
+    _id: request.body.productID,
+    userID: request.user._id
+  };
+  
+  Product.deleteOne(whereObj)
   .then(res => _redirectToAdminProducts(response))
   .catch(err => console.log(err));
 
