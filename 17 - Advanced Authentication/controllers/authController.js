@@ -242,10 +242,10 @@ exports.getResetPasswordPage = (request, response, next) => {
   };
 
   User.findOne(whereObj)
-  .then(user => _getResetPasswordPage(user, response))
+  .then(user => _getResetPasswordPage(user, response, token))
   .catch(err => console.log(err));
 
-  function _getResetPasswordPage(user, response) {
+  function _getResetPasswordPage(user, response, token) {
     if (!user) {
       return response.redirect('/');
     }
@@ -254,6 +254,7 @@ exports.getResetPasswordPage = (request, response, next) => {
       path: path,
       pageTitle: 'Reset Password',
       pathStr: '/reset',
+      passwordToken: token,
       userID: user._id.toString()
     };
      
@@ -267,5 +268,53 @@ exports.getResetPasswordPage = (request, response, next) => {
     if(errorArr.length < 1) return null;
 
     return errorArr[0];
+  }
+};
+
+exports.postNewPassword = (request, response, next) => {
+  const newPasswordObj = {
+    userID: request.body.userID,
+    passwordToken: request.body.passwordToken,
+    newPassword: request.body.password
+  }
+
+  const whereObj = {
+    _id: newPasswordObj.userID,
+    resetToken: newPasswordObj.passwordToken,
+    resetTokenExpiration: {
+      $gt: Date.now()
+    }
+  };
+
+  User.findOne(whereObj)
+  .then(user => _postNewPassword(user, newPasswordObj, response))
+  .catch(err => console.log(err));
+
+  function _postNewPassword(user, newPasswordObj, response) {
+    if (!user) {
+      return response.redirect('/');
+    }
+
+    return _getHashedPassword(newPasswordObj)
+    .then(hashedPasswordStr => _setNewPassword(hashedPasswordStr, user, response))
+    .then(err => _redirectToLoginPage(response));
+  }
+
+  function _getHashedPassword(newPasswordObj) {
+    const passwordStr = newPasswordObj.newPassword;
+
+    return bcryptjs.hash(passwordStr, 12);
+  }
+
+  function _setNewPassword(hashedPasswordStr, user) {
+    user.password = hashedPasswordStr;
+    user.resetToken = undefined;
+    user.resetTokenExpiration = undefined;
+
+    return user.save();
+  }
+
+  function _redirectToLoginPage(response) {
+    return response.redirect('/login');
   }
 };
