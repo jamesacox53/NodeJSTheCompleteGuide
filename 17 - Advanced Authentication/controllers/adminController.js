@@ -74,7 +74,7 @@ exports.postEditProduct = (request, response, next) => {
 };
 
 exports.getProducts = (request, response, next) => {
-  Product.find()
+  Product.find({ userID: request.user._id })
   .then(arr => _renderAdminProductsPage(arr))
   .catch(err => console.log(err));
   
