@@ -2,7 +2,10 @@ const path = require('path');
 const bcryptjs = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
-
+const { validationResult } = require('express-validator');
+/*const checkObj = expressValidator.check;
+const { validationResult } = checkObj;
+*/
 const rootDirectoryStr = path.dirname(require.main.filename);
 const User = require(path.join(rootDirectoryStr, 'models', 'user.js'));
 const gmailCredsObj = require(path.join(rootDirectoryStr, 'sensitive', 'gmailCredsObj.js'));
@@ -18,7 +21,7 @@ exports.getLoginPage = (request, response, next) => {
     path: path,
     pageTitle: 'Login',
     pathStr: '/login',
-    userDoesntExistErr: _getErrorMsg('userDoesntExistErr', request)
+    errorMessage: _getErrorMsg('errorMessage', request)
   };
    
   response.render(path.join('auth', 'login.ejs'), optionsObj);
@@ -38,7 +41,7 @@ exports.getSignupPage = (request, response, next) => {
     path: path,
     pageTitle: 'Sign Up',
     pathStr: '/signup',
-    userAlreadyExistErr: _getErrorMsg('userAlreadyExistErr', request)
+    errorMessage: _getErrorMsg('errorMessage', request)
   };
    
   response.render(path.join('auth', 'signup.ejs'), optionsObj);
@@ -64,7 +67,7 @@ exports.postLogin = (request, response, next) => {
   
   function _postLogin(user, loginObj, request, response) {
     if (!user) {
-      request.flash('userDoesntExistErr', 'Invalid Email Address or Password');
+      request.flash('errorMessage', 'Invalid Email Address or Password');
       return response.redirect('/login');
     }
 
@@ -81,7 +84,7 @@ exports.postLogin = (request, response, next) => {
 
   function _loginOrRedirect(isCorrect, user, request, response) {
     if (!isCorrect) {
-      request.flash('userDoesntExistErr', 'Invalid Email Address or Password');
+      request.flash('errorMessage', 'Invalid Email Address or Password');
       return response.redirect('/login');
     }
     
@@ -99,26 +102,55 @@ exports.postLogin = (request, response, next) => {
 };
 
 exports.postSignup = (request, response, next) => {
-  const signupObj = {
-    emailStr: request.body.email,
-    passwordStr: request.body.password,
-    confirmPasswordStr: request.body.confirmPassword
-  };
-  
-  User.findOne({ email: signupObj.emailStr })
-  .then(user => _postSignup(user, signupObj, request, response))
-  .catch(err => console.log(err));
+  return _postSignup();
 
-  function _postSignup(user, signupObj, request, response) {
+  function _postSignup() {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+      return _renderSignupPage(errors.array());
+
+    } else {
+      return _signup();
+    }
+  }
+
+  function _renderSignupPage(errorsArr) {
+    const optionsObj = {
+      path: path,
+      pageTitle: 'Sign Up',
+      pathStr: '/signup',
+      errorMessage: _getErrorMsg(errorsArr)
+    };
+     
+    return response.status(422).render(path.join('auth', 'signup.ejs'), optionsObj);
+  }
+
+  function _getErrorMsg(errorsArr) {
+    return errorsArr.join('. ');
+  }
+
+  function _signup() {
+    const signupObj = {
+      emailStr: request.body.email,
+      passwordStr: request.body.password,
+      confirmPasswordStr: request.body.confirmPassword
+    };
+
+    User.findOne({ email: signupObj.emailStr })
+    .then(user => _signupUser(user, signupObj))
+    .catch(err => console.log(err));
+  }
+
+  function _signupUser(user, signupObj) {
     if (user) {
-      request.flash('userAlreadyExistErr', 'Email Address already exists');
+      request.flash('errorMessage', 'Email Address already exists');
       return response.redirect('/signup');
     }
 
     return _getHashedPassword(signupObj)
     .then(hashedPasswordStr => _createUser(hashedPasswordStr, signupObj))
     .then(user => _sendSignupEmail(user))
-    .then(user => _storeUserInSession(user, request, response))
+    .then(user => _storeUserInSession(user))
     .catch(err => console.log(err));
   }
 
@@ -153,7 +185,7 @@ exports.postSignup = (request, response, next) => {
     return user;
   }
 
-  function _storeUserInSession(user, request, response) {
+  function _storeUserInSession(user) {
     request.session.user = user;
     request.session.isAuthenticated = true;
     request.session.isLoggedIn = true;
@@ -174,7 +206,7 @@ exports.getResetPage = (request, response, next) => {
     path: path,
     pageTitle: 'Reset Password',
     pathStr: '/reset',
-    userDoesntExistErr: _getErrorMsg('userDoesntExistErr', request)
+    errorMessage: _getErrorMsg('errorMessage', request)
   };
    
   response.render(path.join('auth', 'reset.ejs'), optionsObj);
@@ -208,7 +240,7 @@ exports.postReset = (request, response, next) => {
 
   function _setResetToken(user, token, request, response) {
     if (!user) {
-      request.flash('userDoesntExistErr', "The user doesn't exist");
+      request.flash('errorMessage', "The user doesn't exist");
       return response.redirect('/reset');
     }
 
