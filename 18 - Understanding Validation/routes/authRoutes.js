@@ -1,10 +1,8 @@
 const path = require('path');
 const { check } = require('express-validator');
-/*const checkObj = expressValidator.check;
-const  = checkObj;
-*/
+
 const authController = require(path.join('..', 'controllers', 'authController.js'));
-const emailValidation = check('email').isEmail();
+const emailValidation = check('email').isEmail().withMessage('Please enter a valid email');
 
 const express = require('express');
 const router = express.Router();

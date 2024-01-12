@@ -3,9 +3,7 @@ const bcryptjs = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const { validationResult } = require('express-validator');
-/*const checkObj = expressValidator.check;
-const { validationResult } = checkObj;
-*/
+
 const rootDirectoryStr = path.dirname(require.main.filename);
 const User = require(path.join(rootDirectoryStr, 'models', 'user.js'));
 const gmailCredsObj = require(path.join(rootDirectoryStr, 'sensitive', 'gmailCredsObj.js'));
@@ -126,7 +124,15 @@ exports.postSignup = (request, response, next) => {
   }
 
   function _getErrorMsg(errorsArr) {
-    return errorsArr.join('. ');
+    const messagesArr = [];
+
+    for(let i = 0; i < errorsArr.length; i++) {
+      const messageStr = errorsArr[i].msg;
+
+      messagesArr.push(messageStr);
+    }
+
+    return messagesArr.join('. ');
   }
 
   function _signup() {
