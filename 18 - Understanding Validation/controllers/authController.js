@@ -142,17 +142,6 @@ exports.postSignup = (request, response, next) => {
       confirmPasswordStr: request.body.confirmPassword
     };
 
-    User.findOne({ email: signupObj.emailStr })
-    .then(user => _signupUser(user, signupObj))
-    .catch(err => console.log(err));
-  }
-
-  function _signupUser(user, signupObj) {
-    if (user) {
-      request.flash('errorMessage', 'Email Address already exists');
-      return response.redirect('/signup');
-    }
-
     return _getHashedPassword(signupObj)
     .then(hashedPasswordStr => _createUser(hashedPasswordStr, signupObj))
     .then(user => _sendSignupEmail(user))
