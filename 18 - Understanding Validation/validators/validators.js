@@ -8,6 +8,14 @@ const passwordValidator = body('password',
 .isLength({ min: 5 })
 .isAlphanumeric();
 
+const confirmPasswordValidator = body('confirmPassword')
+.custom((value, { req }) => {
+    if (value !== req.body.password)
+        throw new Error('Password and Confirm Password have to match');
+    
+    return true;
+});
+
 exports.emailValidator = emailValidator;
 exports.passwordValidator = passwordValidator;
-exports.signupValidatorsArr = [emailValidator, passwordValidator];
+exports.signupValidatorsArr = [emailValidator, passwordValidator, confirmPasswordValidator];
