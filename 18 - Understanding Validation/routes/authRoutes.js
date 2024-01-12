@@ -1,8 +1,7 @@
 const path = require('path');
-const { check } = require('express-validator');
 
 const authController = require(path.join('..', 'controllers', 'authController.js'));
-const emailValidation = check('email').isEmail().withMessage('Please enter a valid email');
+const validators = require(path.join('..', 'validators', 'validators.js'));
 
 const express = require('express');
 const router = express.Router();
@@ -13,7 +12,7 @@ router.get('/reset/:token', authController.getResetPasswordPage);
 router.get('/reset', authController.getResetPage);
 
 router.post('/login', authController.postLogin);
-router.post('/signup', emailValidation, authController.postSignup);
+router.post('/signup', validators.signupValidatorsArr, authController.postSignup);
 router.post('/reset', authController.postReset);
 router.post('/logout', authController.postLogout);
 router.post('/new-password', authController.postNewPassword);
