@@ -3,6 +3,7 @@ const bcryptjs = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const { validationResult } = require('express-validator');
+const { error } = require('console');
 
 const rootDirectoryStr = path.dirname(require.main.filename);
 const User = require(path.join(rootDirectoryStr, 'models', 'user.js'));
@@ -44,6 +45,11 @@ exports.getSignupPage = (request, response, next) => {
       email: '',
       password: '',
       confirmPassword: ''
+    },
+    fieldErrorsObj: {
+      email: false,
+      password: false,
+      confirmPassword: false
     }
   };
    
@@ -160,7 +166,8 @@ exports.postSignup = (request, response, next) => {
         email: request.body.email,
         password: request.body.password,
         confirmPassword: request.body.confirmPassword
-      }
+      },
+      fieldErrorsObj: _getFieldErrorsObj(errorsArr)
     };
      
     return response.status(422).render(path.join('auth', 'signup.ejs'), optionsObj);
@@ -176,6 +183,23 @@ exports.postSignup = (request, response, next) => {
     }
 
     return messagesArr.join('. ');
+  }
+
+  function _getFieldErrorsObj(errorsArr) {
+    const fieldErrorsObj = {
+      email: false,
+      password: false,
+      confirmPassword: false
+    };
+
+    for (let i = 0; i < errorsArr.length; i++) {
+      const errorObj = errorsArr[i];
+      const path = errorObj['path'];
+
+      fieldErrorsObj[path] = true;
+    }
+
+    return fieldErrorsObj;
   }
 
   function _signup() {
