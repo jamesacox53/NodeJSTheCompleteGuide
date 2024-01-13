@@ -39,7 +39,12 @@ exports.getSignupPage = (request, response, next) => {
     path: path,
     pageTitle: 'Sign Up',
     pathStr: '/signup',
-    errorMessage: _getErrorMsg('errorMessage', request)
+    errorMessage: _getErrorMsg('errorMessage', request),
+    oldInput: {
+      email: '',
+      password: '',
+      confirmPassword: ''
+    }
   };
    
   response.render(path.join('auth', 'signup.ejs'), optionsObj);
@@ -150,7 +155,12 @@ exports.postSignup = (request, response, next) => {
       path: path,
       pageTitle: 'Sign Up',
       pathStr: '/signup',
-      errorMessage: _getErrorMsg(errorsArr)
+      errorMessage: _getErrorMsg(errorsArr),
+      oldInput: {
+        email: request.body.email,
+        password: request.body.password,
+        confirmPassword: request.body.confirmPassword
+      }
     };
      
     return response.status(422).render(path.join('auth', 'signup.ejs'), optionsObj);
