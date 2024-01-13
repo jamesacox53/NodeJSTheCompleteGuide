@@ -55,22 +55,55 @@ exports.getSignupPage = (request, response, next) => {
 };
 
 exports.postLogin = (request, response, next) => {
-  const loginObj = {
-    emailStr: request.body.email,
-    passwordStr: request.body.password
-  };
+  const errors = validationResult(request);
+  if (!errors.isEmpty()) {
+    return _renderLoginPage(errors.array());
+
+  } else {
+    return _login();
+  }
+
+  function _renderLoginPage(errorsArr) {
+    const optionsObj = {
+      path: path,
+      pageTitle: 'Login',
+      pathStr: '/login',
+      errorMessage: _getErrorMsg(errorsArr)
+    };
+       
+    return response.status(422).render(path.join('auth', 'login.ejs'), optionsObj);
+  }
   
-  User.findOne({ 'email': loginObj.emailStr })
-  .then(user => _postLogin(user, loginObj, request, response))
+  function _getErrorMsg(errorsArr) {
+    const messagesArr = [];
   
-  function _postLogin(user, loginObj, request, response) {
+    for(let i = 0; i < errorsArr.length; i++) {
+      const messageStr = errorsArr[i].msg;
+  
+      messagesArr.push(messageStr);
+    }
+  
+    return messagesArr.join('. ');
+  }
+
+  function _login() {
+    const loginObj = {
+      emailStr: request.body.email,
+      passwordStr: request.body.password
+    };
+      
+    return User.findOne({ 'email': loginObj.emailStr })
+    .then(user => _postLogin(user, loginObj))
+  }
+  
+  function _postLogin(user, loginObj) {
     if (!user) {
       request.flash('errorMessage', 'Invalid Email Address or Password');
       return response.redirect('/login');
     }
 
     return _isCorrectPassword(user, loginObj)
-    .then(isCorrect => _loginOrRedirect(isCorrect, user, request, response));
+    .then(isCorrect => _loginOrRedirect(isCorrect, user));
   }
 
   function _isCorrectPassword(user, loginObj) {
@@ -80,16 +113,16 @@ exports.postLogin = (request, response, next) => {
     return bcryptjs.compare(loginPasswordStr, userPasswordHashStr);
   }
 
-  function _loginOrRedirect(isCorrect, user, request, response) {
+  function _loginOrRedirect(isCorrect, user) {
     if (!isCorrect) {
       request.flash('errorMessage', 'Invalid Email Address or Password');
       return response.redirect('/login');
     }
     
-    return _storeUserInSession(user, request, response);
+    return _storeUserInSession(user);
   }
 
-  function _storeUserInSession(user, request, response) {
+  function _storeUserInSession(user) {
     request.session.user = user;
     request.session.isAuthenticated = true;
     request.session.isLoggedIn = true;

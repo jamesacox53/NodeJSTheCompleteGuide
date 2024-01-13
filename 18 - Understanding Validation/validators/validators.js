@@ -33,5 +33,5 @@ const confirmPasswordValidator = body('confirmPassword')
 
 exports.emailValidator = emailValidator;
 exports.passwordValidator = passwordValidator;
-exports.signupValidatorsArr = [emailValidator, emailAlreadyExistsValidator, passwordValidator,
-    confirmPasswordValidator];
+exports.loginValidatorsArr = [emailValidator, passwordValidator];
+exports.signupValidatorsArr = [emailValidator, emailAlreadyExistsValidator, passwordValidator, confirmPasswordValidator];
