@@ -1,32 +1,108 @@
 const path = require('path');
+const { validationResult } = require('express-validator');
 const Product = require(path.join('..', 'models', 'product.js'));
 
 exports.getAddProductPage = (request, response, next) => {
   const optionsObj = {
     path: path,
     pageTitle: 'Add Product',
-    pathStr: '/admin/add-product'
+    pathStr: '/admin/add-product',
+    errorMessage: '',
+    oldInput: {
+      title: '',
+      imageURL: '',
+      price: 0,
+      description: ''
+    },
+    fieldErrorsObj: {
+      title: false,
+      imageURL: false,
+      price: false,
+      description: false
+    }
   };
    
   response.render(path.join('admin', 'add-product.ejs'), optionsObj);
 };
 
 exports.postAddProduct = (request, response, next) => {
-  const productArgsObj = {
-    title: request.body.title,
-    imageURL: request.body.imageURL,
-    price: request.body.price,
-    description: request.body.description,
-    userID: request.user._id
-  };
+  return _postAddProuct();
+  
+  function _postAddProuct() {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+      return _renderAddProductPage(errors.array());
+  
+    } else {
+      return _addProduct();
+    }
+  }
 
-  const product = new Product(productArgsObj);
+  function _renderAddProductPage(errorsArr) {
+    const optionsObj = {
+      path: path,
+      pageTitle: 'Add Product',
+      pathStr: '/admin/add-product',
+      errorMessage: _getErrorMsg(errorsArr),
+      oldInput: {
+        title: request.body.title,
+        imageURL: request.body.imageURL,
+        price: request.body.price,
+        description: request.body.description
+      },
+      fieldErrorsObj: _getFieldErrorsObj(errorsArr)
+    };
+     
+    response.render(path.join('admin', 'add-product.ejs'), optionsObj);
+  }
+
+  function _getErrorMsg(errorsArr) {
+    const messagesArr = [];
+    
+    for(let i = 0; i < errorsArr.length; i++) {
+      const messageStr = errorsArr[i].msg;
+    
+      messagesArr.push(messageStr);
+    }
+    
+    return messagesArr.join('. ');
+  }
+
+  function _getFieldErrorsObj(errorsArr) {
+    const fieldErrorsObj = {
+      title: false,
+      imageURL: false,
+      price: false,
+      description: false
+    };
   
-  product.save()
-  .then(err => _gotoIndexPage(err, response))
-  .catch(err => console.log(err));
+    for (let i = 0; i < errorsArr.length; i++) {
+      const errorObj = errorsArr[i];
+      const path = errorObj['path'];
   
-  function _gotoIndexPage(err, response) {
+      fieldErrorsObj[path] = true;
+    }
+  
+    return fieldErrorsObj;
+  }
+
+  function _addProduct() {
+    const productArgsObj = {
+      title: request.body.title,
+      imageURL: request.body.imageURL,
+      price: request.body.price,
+      description: request.body.description,
+      userID: request.user._id
+    };
+  
+    const product = new Product(productArgsObj);
+    
+    return product.save()
+    .then(err => _gotoIndexPage(err))
+    .catch(err => console.log(err));
+  }
+    
+  function _gotoIndexPage(err) {
     response.redirect('/');
   }
 };

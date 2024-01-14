@@ -98,10 +98,10 @@ exports.postLogin = (request, response, next) => {
     
   function _postLogin(user, loginObj) {
     if (!user) {
-      request.flash('errorMessage', 'Invalid Email Address or Password');
-      return response.redirect('/login');
+      const errArr = [{path: 'email', msg: 'Invalid Email Address'}, {path: 'password', msg: 'Invalid Password'}];
+      return _renderLoginPage(errArr);
     }
-  
+
     return _isCorrectPassword(user, loginObj)
     .then(isCorrect => _loginOrRedirect(isCorrect, user));
   }
@@ -115,8 +115,8 @@ exports.postLogin = (request, response, next) => {
   
   function _loginOrRedirect(isCorrect, user) {
     if (!isCorrect) {
-      request.flash('errorMessage', 'Invalid Email Address or Password');
-      return response.redirect('/login');
+      const errArr = [{path: 'email', msg: 'Invalid Email Address'}, {path: 'password', msg: 'Invalid Password'}];
+      return _renderLoginPage(errArr);
     }
       
     return _storeUserInSession(user);

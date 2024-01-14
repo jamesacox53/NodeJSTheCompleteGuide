@@ -33,7 +33,5 @@ const confirmPasswordValidator = body('confirmPassword')
     return true;
 });
 
-exports.emailValidator = emailValidator;
-exports.passwordValidator = passwordValidator;
 exports.loginValidatorsArr = [emailValidator, passwordValidator];
 exports.signupValidatorsArr = [emailValidator, emailAlreadyExistsValidator, passwordValidator, confirmPasswordValidator];
