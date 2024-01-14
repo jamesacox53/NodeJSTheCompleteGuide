@@ -26,9 +26,9 @@ exports.getAddProductPage = (request, response, next) => {
 };
 
 exports.postAddProduct = (request, response, next) => {
-  return _postAddProuct();
+  return _postAddProduct();
   
-  function _postAddProuct() {
+  function _postAddProduct() {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
       return _renderAddProductPage(errors.array());
@@ -53,7 +53,7 @@ exports.postAddProduct = (request, response, next) => {
       fieldErrorsObj: _getFieldErrorsObj(errorsArr)
     };
      
-    response.render(path.join('admin', 'add-product.ejs'), optionsObj);
+    response.status(442).render(path.join('admin', 'add-product.ejs'), optionsObj);
   }
 
   function _getErrorMsg(errorsArr) {
@@ -119,7 +119,14 @@ exports.getEditProductPage = (request, response, next) => {
       path: path,
       pageTitle: 'Edit Product',
       pathStr: '/admin/edit-product',
-      product: product
+      errorMessage: '',
+      product: product,
+      fieldErrorsObj: {
+        title: false,
+        imageURL: false,
+        price: false,
+        description: false
+      }
     };
 
     response.render(path.join('admin', 'edit-product.ejs'), optionsObj);
@@ -127,11 +134,75 @@ exports.getEditProductPage = (request, response, next) => {
 };
 
 exports.postEditProduct = (request, response, next) => {
-  const productID = request.body.productID;
+  _postEditProduct();
+
+  function _postEditProduct() {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+      return _renderEditProductPage(errors.array());
   
-  Product.findById(productID)
-  .then(product => _ifProductIsCreatedByUserThenEdit(product, request, response))
+    } else {
+      return _editProduct();
+    }
+  }
   
+  function _renderEditProductPage(errorsArr) {
+    const optionsObj = {
+      path: path,
+      pageTitle: 'Edit Product',
+      pathStr: '/admin/edit-product',
+      errorMessage: _getErrorMsg(errorsArr),
+      product: {
+        _id: request.body.productID,
+        title: request.body.title,
+        imageURL: request.body.imageURL,
+        price: request.body.price,
+        description: request.body.description,
+        userID: request.user._id,
+      },
+      fieldErrorsObj: _getFieldErrorsObj(errorsArr)
+    };
+
+    response.status(442).render(path.join('admin', 'edit-product.ejs'), optionsObj);
+  }
+
+  function _getErrorMsg(errorsArr) {
+    const messagesArr = [];
+    
+    for(let i = 0; i < errorsArr.length; i++) {
+      const messageStr = errorsArr[i].msg;
+    
+      messagesArr.push(messageStr);
+    }
+    
+    return messagesArr.join('. ');
+  }
+
+  function _getFieldErrorsObj(errorsArr) {
+    const fieldErrorsObj = {
+      title: false,
+      imageURL: false,
+      price: false,
+      description: false
+    };
+  
+    for (let i = 0; i < errorsArr.length; i++) {
+      const errorObj = errorsArr[i];
+      const path = errorObj['path'];
+  
+      fieldErrorsObj[path] = true;
+    }
+  
+    return fieldErrorsObj;
+  }
+
+  function _editProduct() {
+    const productID = request.body.productID;
+  
+    return Product.findById(productID)
+    .then(product => _ifProductIsCreatedByUserThenEdit(product, request, response));
+  }
+
   function _ifProductIsCreatedByUserThenEdit(product, request, response) {
     if (product.userID.toString() !== request.user._id.toString()) {
       return response.redirect('/');
@@ -153,7 +224,7 @@ exports.postEditProduct = (request, response, next) => {
   }
 
   function _gotoAdminProductPage(err, response) {
-    response.redirect('/admin/products');
+    return response.redirect('/admin/products');
   }
 };
 
