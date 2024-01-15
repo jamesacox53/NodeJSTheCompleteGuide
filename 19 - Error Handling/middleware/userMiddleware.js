@@ -9,15 +9,18 @@ module.exports = (request, response, next) => {
     }
     
     User.findById(request.session.user._id)
-    .then(user => _addUserToRequest(user, request))
-    .then(err => _gotoNextMiddleware(next))
-    .catch(err => console.log(err));
+    .then(user => _userMiddleware(user))
+    .catch(err => _handleError(err));
 
-    function _addUserToRequest(user, request) {
+    function _userMiddleware(user) {
+        if (!user)
+            return next();
+
         request.user = user;
+        next();
     }
 
-    function _gotoNextMiddleware(next) {
-        next();
+    function _handleError(err) {
+        throw new Error(err);
     }
 };
