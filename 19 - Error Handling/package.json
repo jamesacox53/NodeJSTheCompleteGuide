@@ -1,10 +1,10 @@
 {
-  "name": "18---understanding-validation",
+  "name": "19---error-handling",
   "version": "1.0.0",
+  "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
@@ -21,7 +21,5 @@
     "mongodb": "^6.3.0",
     "mongoose": "^8.0.4",
     "nodemailer": "^6.9.8"
-  },
-  "devDependencies": {},
-  "description": ""
+  }
 }
