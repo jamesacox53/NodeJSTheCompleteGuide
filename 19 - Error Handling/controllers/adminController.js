@@ -49,11 +49,15 @@ exports.postAddProduct = (request, response, next) => {
     
     return product.save()
     .then(err => _gotoIndexPage(err))
-    .catch(err => console.log(err));
+    .catch(err => _handleError(err));
   }
     
   function _gotoIndexPage(err) {
     response.redirect('/');
+  }
+
+  function _handleError(err) {
+    response.redirect('/500');
   }
 };
 
