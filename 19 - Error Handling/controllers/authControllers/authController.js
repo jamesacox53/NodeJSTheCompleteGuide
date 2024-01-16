@@ -53,7 +53,7 @@ exports.postReset = (request, response, next) => {
 
     return User.findOne({ email: emailStr })
     .then(user => _setResetToken(user, token, request, response))
-    .catch(err => console.log(err));
+    .catch(err => _handleError(err));
   }
 
   function _setResetToken(user, token, request, response) {
@@ -80,6 +80,12 @@ exports.postReset = (request, response, next) => {
     transporter.sendMail(mailOptions);
     return response.redirect('/');
   }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(err);
+  }
 };
 
 exports.getResetPasswordPage = (request, response, next) => {
@@ -93,7 +99,7 @@ exports.getResetPasswordPage = (request, response, next) => {
 
   User.findOne(whereObj)
   .then(user => _getResetPasswordPage(user, response, token))
-  .catch(err => console.log(err));
+  .catch(err => _handleError(err));
 
   function _getResetPasswordPage(user, response, token) {
     if (!user) {
@@ -119,6 +125,12 @@ exports.getResetPasswordPage = (request, response, next) => {
 
     return errorArr[0];
   }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(err);
+  }
 };
 
 exports.postNewPassword = (request, response, next) => {
@@ -138,7 +150,7 @@ exports.postNewPassword = (request, response, next) => {
 
   User.findOne(whereObj)
   .then(user => _postNewPassword(user, newPasswordObj, response))
-  .catch(err => console.log(err));
+  .catch(err => _handleError(err));
 
   function _postNewPassword(user, newPasswordObj, response) {
     if (!user) {
@@ -166,5 +178,11 @@ exports.postNewPassword = (request, response, next) => {
 
   function _redirectToLoginPage(response) {
     return response.redirect('/login');
+  }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(err);
   }
 };

@@ -94,6 +94,7 @@ exports.postLogin = (request, response, next) => {
         
     return User.findOne({ 'email': loginObj.emailStr })
     .then(user => _postLogin(user, loginObj))
+    .catch(err => _handleError(err));
   }
     
   function _postLogin(user, loginObj) {
@@ -129,5 +130,11 @@ exports.postLogin = (request, response, next) => {
     return request.session.save((err) => {
       response.redirect('/');
     });
+  }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(err);
   }
 };

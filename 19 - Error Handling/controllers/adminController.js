@@ -57,7 +57,9 @@ exports.postAddProduct = (request, response, next) => {
   }
 
   function _handleError(err) {
-    response.redirect('/500');
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
   }
 };
 
@@ -66,7 +68,7 @@ exports.getEditProductPage = (request, response, next) => {
 
   Product.findById(productID)
   .then(product => _renderEditProductPage(product, response))
-  .catch(err => console.log(err));
+  .catch(err => _handleError(err));
   
   function _renderEditProductPage(product, response) {
     const inputObj = {
@@ -75,6 +77,12 @@ exports.getEditProductPage = (request, response, next) => {
     };
   
     adminRenderer.renderEditProductPage(inputObj); 
+  }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
   }
 };
 
@@ -116,7 +124,7 @@ exports.postEditProduct = (request, response, next) => {
 
     return _editProductAndSave(product, request)
     .then(err => _gotoAdminProductPage(err, response))
-    .catch(err => console.log(err));
+    .catch(err => _handleError(err));
   }
 
   function _editProductAndSave(product, request) {
@@ -132,12 +140,18 @@ exports.postEditProduct = (request, response, next) => {
   function _gotoAdminProductPage(err, response) {
     return response.redirect('/admin/products');
   }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
+  }
 };
 
 exports.getProducts = (request, response, next) => {
   Product.find({ userID: request.user._id })
   .then(arr => _renderAdminProductsPage(arr))
-  .catch(err => console.log(err));
+  .catch(err => _handleError(err));
   
   function _renderAdminProductsPage(arr) {
     const inputObj = {
@@ -146,6 +160,12 @@ exports.getProducts = (request, response, next) => {
     };
   
     adminRenderer.renderAdminProductsPage(inputObj);
+  }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
   }
 };
 
@@ -157,9 +177,15 @@ exports.postDeleteProduct = (request, response, next) => {
   
   Product.deleteOne(whereObj)
   .then(res => _redirectToAdminProducts(response))
-  .catch(err => console.log(err));
+  .catch(err => _handleError(err));
 
   function _redirectToAdminProducts(response) {
     response.redirect('/admin/products');
+  }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
   }
 };

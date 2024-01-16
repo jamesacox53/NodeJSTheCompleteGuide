@@ -5,7 +5,7 @@ const Order = require(path.join('..', 'models', 'order.js'));
 exports.getProducts = (request, response, next) => {
   Product.find()
   .then(arr => _getProducts(arr))
-  .catch(err => console.log(err));
+  .catch(err => _handleError(err));
   
   function _getProducts(arr) {
     const optionsObj = {
@@ -17,6 +17,12 @@ exports.getProducts = (request, response, next) => {
   
     response.render(path.join('shop', 'product-list.ejs'), optionsObj);
   }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(err);
+  }
 };
 
 exports.getProduct = (request, response, next) => {
@@ -24,7 +30,7 @@ exports.getProduct = (request, response, next) => {
   
   Product.findById(productID)
   .then(product => _renderProductDetailsPage(product, response))
-  .catch(err => console.log(err));
+  .catch(err => _handleError(err));
   
   function _renderProductDetailsPage (product, response) {
     const optionsObj = {
@@ -36,12 +42,18 @@ exports.getProduct = (request, response, next) => {
 
     response.render(path.join('shop', 'product-detail.ejs'), optionsObj);
   }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(err);
+  }
 };
 
 exports.getIndex = (request, response, next) => {
   Product.find()
   .then(arr => _getProducts(arr, response))
-  .catch(err => console.log(err));
+  .catch(err => _handleError(err));
   
   function _getProducts(arr, response) {
     const optionsObj = {
@@ -53,12 +65,18 @@ exports.getIndex = (request, response, next) => {
   
     response.render(path.join('shop', 'index.ejs'), optionsObj);
   }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(err);
+  }
 };
 
 exports.getCart = (request, response, next) => {
   request.user.getCart()
   .then(cart => _renderCartPage(cart))
-  .catch(err => console.log(err));
+  .catch(err => _handleError(err));
   
   function _renderCartPage(cart) {
     const optionsObj = {
@@ -70,6 +88,12 @@ exports.getCart = (request, response, next) => {
     
     response.render(path.join('shop', 'cart.ejs'), optionsObj);
   }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(err);
+  }
 };
 
 exports.postCart = (request, response, next) => {
@@ -78,10 +102,16 @@ exports.postCart = (request, response, next) => {
   Product.findById(productID)
   .then(product => request.user.addToCart(product))
   .then(err => _redirectToCartPage(response))
-  .catch(err => console.log(err));
+  .catch(err => _handleError(err));
 
   function _redirectToCartPage(response) {
     response.redirect('/cart');
+  }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(err);
   }
 };
 
@@ -90,17 +120,23 @@ exports.postCartDeleteItem = (request, response, next) => {
 
   request.user.deleteCartItem(productID)
   .then(err => _redirectToCart(response))
-  .catch(err => console.log(err));
+  .catch(err => _handleError(err));
 
   function _redirectToCart(response) {
     response.redirect('/cart');
+  }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(err);
   }
 };
 
 exports.getOrders = (request, response, next) => {
   Order.find({ 'user.userID': request.user._id })
   .then(ordersArr => _renderOrdersPage(ordersArr))
-  .catch(err => console.log(err))
+  .catch(err => _handleError(err))
   
   function _renderOrdersPage(ordersArr) {
     const optionsObj = {
@@ -112,6 +148,12 @@ exports.getOrders = (request, response, next) => {
   
     response.render(path.join('shop', 'orders.ejs'), optionsObj);
   }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(err);
+  }
 };
 
 exports.postOrder = (request, response, next) => {
@@ -119,7 +161,7 @@ exports.postOrder = (request, response, next) => {
   .then(user => _createOrder(user))
   .then(order => request.user.clearCart())
   .then(err => _redirectToOrdersPage(response))
-  .catch(err => console.log(err));
+  .catch(err => _handleError(err));
 
   function _createOrder(user) {
     const orderObj = Order.getOrderConstructorObj(user);
@@ -130,6 +172,12 @@ exports.postOrder = (request, response, next) => {
 
   function _redirectToOrdersPage(response) {
     response.redirect('/orders');
+  }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(err);
   }
 };
 

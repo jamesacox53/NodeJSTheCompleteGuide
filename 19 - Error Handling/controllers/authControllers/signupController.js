@@ -113,7 +113,7 @@ exports.postSignup = (request, response, next) => {
     .then(hashedPasswordStr => _createUser(hashedPasswordStr, signupObj))
     .then(user => _sendSignupEmail(user))
     .then(user => _storeUserInSession(user))
-    .catch(err => console.log(err));
+    .catch(err => _handleError(err));
   }
   
   function _getHashedPassword(signupObj) {
@@ -154,5 +154,11 @@ exports.postSignup = (request, response, next) => {
     return request.session.save((err) => {
       response.redirect('/');
     });
+  }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(err);
   }
 };

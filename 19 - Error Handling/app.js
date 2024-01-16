@@ -22,6 +22,8 @@ const authRoutes = require(path.join(rootDirectoryStr, 'routes', 'authRoutes.js'
 const shopRoutes = require(path.join(rootDirectoryStr, 'routes', 'shopRoutes.js'));
 const errorRoutes = require(path.join(rootDirectoryStr, 'routes', 'errorRoutes.js'));
 
+const errorHandler = require(path.join(rootDirectoryStr, 'errorHandlers', 'errorHandler.js'));
+
 const { csrfSynchronisedProtection } = csrfSync(csrfSyncOptionsObj);
 
 const app = express();
@@ -41,6 +43,8 @@ app.use(adminRoutes);
 app.use(authRoutes);
 app.use(shopRoutes);
 app.use(errorRoutes);
+
+errorHandler.addErrorHandlers(app);
 
 const server = http.createServer(app);
 
