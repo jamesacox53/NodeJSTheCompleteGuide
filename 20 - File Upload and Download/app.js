@@ -14,7 +14,7 @@ const rootDirectoryStr = path.dirname(require.main.filename);
 const connectionStr = require(path.join(rootDirectoryStr, 'sensitive', 'mongooseDBConnectionStr.js'));
 const expressSession = require(path.join(rootDirectoryStr, 'sessions', 'expressSession.js'));
 const csrfSyncOptionsObj = require(path.join(rootDirectoryStr, 'csrf', 'csrfSyncObj.js'));
-const multerObj = require(path.join(rootDirectoryStr, 'utils', 'multerObj', 'multerObj.js'));
+const multerOpts = require(path.join(rootDirectoryStr, 'utils', 'multerOpts', 'multerOpts.js'));
 
 const addViewRenderVariables = require(path.join(rootDirectoryStr, 'middleware', 'addViewRenderVariables.js'));
 const userMiddleware = require(path.join(rootDirectoryStr, 'middleware', 'userMiddleware.js'));
@@ -26,7 +26,7 @@ const errorRoutes = require(path.join(rootDirectoryStr, 'routes', 'errorRoutes.j
 
 const errorHandler = require(path.join(rootDirectoryStr, 'errorHandlers', 'errorHandler.js'));
 
-const fileStorage = multer.diskStorage(multerObj);
+const fileStorage = multer.diskStorage(multerOpts.fileStorageObj);
 const { csrfSynchronisedProtection } = csrfSync(csrfSyncOptionsObj);
 
 const app = express();
@@ -34,7 +34,7 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(multer({ storage: fileStorage }).single('image'));
+app.use(multer({ storage: fileStorage, fileFilter: multerOpts.fileFilterFunc }).single('image'));
 app.use(express.static(path.join(rootDirectoryStr, 'public')));
 app.use(expressSession);
 app.use(csrfSynchronisedProtection);
