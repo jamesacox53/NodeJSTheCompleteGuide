@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const { csrfSync } = require('csrf-sync');
 const connectFlash = require('connect-flash');
+const multer = require('multer');
 
 const rootDirectoryStr = path.dirname(require.main.filename);
 const connectionStr = require(path.join(rootDirectoryStr, 'sensitive', 'mongooseDBConnectionStr.js'));
@@ -31,6 +32,7 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(multer({dest: 'images'}).single('image'))
 app.use(express.static(path.join(rootDirectoryStr, 'public')));
 app.use(expressSession);
 app.use(csrfSynchronisedProtection);

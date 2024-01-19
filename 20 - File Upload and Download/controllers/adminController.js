@@ -39,7 +39,7 @@ exports.postAddProduct = (request, response, next) => {
   function _addProduct() {
     const productArgsObj = {
       title: request.body.title,
-      imageURL: request.body.imageURL,
+      image: request.file,
       price: request.body.price,
       description: request.body.description,
       userID: request.user._id
