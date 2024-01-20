@@ -3,8 +3,7 @@ const fileStorageObj = {
         cb(null, 'images');
     },
     filename: (req, file, cb) => {
-        // cb(null, new Date().toISOString() + '-' + file.originalname);
-        cb(null, file.originalname);
+        cb(null, new Date().getTime().toString() + '-' + file.originalname);
     }
 };
 
