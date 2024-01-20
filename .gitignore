@@ -9,6 +9,7 @@ expressSessionSecretStr.js
 mongooseDBConnectionStr.js
 gmailCredsObj.js
 testEmailAccsObj.js
+images/
 
 # Logs
 logs

@@ -3,6 +3,7 @@ const addErrorHandlers = (app) => {
 };
 
 const sendTo500Page = (error, request, response, next) => {
+    console.log(error);
     response.redirect('/500');
 };
 
