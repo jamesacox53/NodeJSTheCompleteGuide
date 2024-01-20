@@ -17,12 +17,14 @@ exports.postAddProduct = (request, response, next) => {
   
   function _postAddProduct() {
     const errors = validationResult(request);
-    if (!errors.isEmpty()) {
+
+    if (!errors.isEmpty())
       return _renderAddProductPage(errors.array());
   
-    } else {
-      return _addProduct();
-    }
+    if (!request.file || !request.file.path)
+      return _renderAddProductPage();
+
+    return _addProduct();
   }
 
   function _renderAddProductPage(errorsArr) {
@@ -91,12 +93,11 @@ exports.postEditProduct = (request, response, next) => {
 
   function _postEditProduct() {
     const errors = validationResult(request);
-    if (!errors.isEmpty()) {
+    
+    if (!errors.isEmpty())
       return _renderEditProductPage(errors.array());
-  
-    } else {
-      return _editProduct();
-    }
+    
+    return _editProduct();
   }
   
   function _renderEditProductPage(errorsArr) {
@@ -129,10 +130,13 @@ exports.postEditProduct = (request, response, next) => {
 
   function _editProductAndSave(product, request) {
     product.title = request.body.title;
-    product.imageURL = request.body.imageURL;
     product.description = request.body.description;
     product.price = request.body.price;
     product.userID = request.user._id;
+
+    const file = request.file;
+    if (file && file.path)
+      product.imageURL = file.path;
   
     return product.save();
   }
