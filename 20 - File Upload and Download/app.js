@@ -36,6 +36,7 @@ app.set('views', 'views');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({ storage: fileStorage, fileFilter: multerOpts.fileFilterFunc }).single('image'));
 app.use(express.static(path.join(rootDirectoryStr, 'public')));
+app.use('/images', express.static(path.join(rootDirectoryStr, 'images')));
 app.use(expressSession);
 app.use(csrfSynchronisedProtection);
 app.use(connectFlash());
