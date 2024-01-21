@@ -10,6 +10,7 @@ mongooseDBConnectionStr.js
 gmailCredsObj.js
 testEmailAccsObj.js
 images/
+invoices/
 
 # Logs
 logs

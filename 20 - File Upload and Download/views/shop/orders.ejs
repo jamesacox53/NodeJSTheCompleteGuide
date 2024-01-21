@@ -9,6 +9,7 @@
                     <% for (orderObj of ordersArr) { %>
                         <li>
                             <h1># <%= orderObj._id.toString() %></h1>
+                            <a href="/orders/invoices/<%= orderObj._id.toString() %>">Invoice</a>
                             <ul>
                                 <% for (cartObj of orderObj.products) { %>
                                     <li><%= cartObj.productID.title %> (<%= cartObj.quantity %>)</li>

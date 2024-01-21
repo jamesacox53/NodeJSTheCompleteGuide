@@ -9,6 +9,7 @@ router.get('/products/:productID', shopController.getProduct);
 router.get('/products', shopController.getProducts);
 router.get('/cart', isAuth, shopController.getCart);
 router.get('/orders', isAuth, shopController.getOrders);
+router.get('/orders/invoices/:orderID', isAuth, shopController.getInvoice);
 // router.get('/checkout', shopController.getCheckout);
 router.get('/', shopController.getIndex);
 
