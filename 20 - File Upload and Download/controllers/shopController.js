@@ -193,6 +193,8 @@ exports.getInvoice = (request, response, next) => {
     if (err)
       return next(err);
 
+    response.setHeader('Content-Type', 'application/pdf');
+    response.setHeader('Content-Disposition', 'inline; filename="' + invoiceNameStr + '"');
     return response.send(data);
   }
 }
