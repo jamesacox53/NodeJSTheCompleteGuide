@@ -184,12 +184,25 @@ exports.postOrder = (request, response, next) => {
 
 exports.getInvoice = (request, response, next) => {
   const orderID = request.params.orderID;
-  const invoiceNameStr = 'invoice-' + orderID + '.pdf';
-  const invoicePath = path.join('data', 'invoices', invoiceNameStr);
 
-  fs.readFile(invoicePath, (err, data) => _finishedRead(err, data));
+  Order.findById(orderID)
+  .then(order => _getInvoice(order))
+  .catch(err => next(err));
   
-  function _finishedRead(err, data) {
+  function _getInvoice(order) {
+    if (!order)
+      return next(new Error('No order found.'));
+
+    if (order.user.userID.toString() !== request.user._id.toString())
+      return next(new Error('Unauthorized.'));
+
+    const invoiceNameStr = 'invoice-' + orderID + '.pdf';
+    const invoicePath = path.join('data', 'invoices', invoiceNameStr);
+    
+    fs.readFile(invoicePath, (err, data) => _finishedRead(invoiceNameStr, err, data));
+  }
+
+  function _finishedRead(invoiceNameStr, err, data) {
     if (err)
       return next(err);
 
@@ -197,7 +210,7 @@ exports.getInvoice = (request, response, next) => {
     response.setHeader('Content-Disposition', 'inline; filename="' + invoiceNameStr + '"');
     return response.send(data);
   }
-}
+};
 
 /*
 exports.getCheckout = (request, response, next) => {
