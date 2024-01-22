@@ -1,5 +1,7 @@
 const path = require('path');
 const fs = require('fs');
+
+const pdfGenerator = require(path.join('..', 'utils', 'pdfGenerator', 'pdfGenerator.js'));
 const Product = require(path.join('..', 'models', 'product.js'));
 const Order = require(path.join('..', 'models', 'order.js'));
 
@@ -196,19 +198,14 @@ exports.getInvoice = (request, response, next) => {
     if (order.user.userID.toString() !== request.user._id.toString())
       return next(new Error('Unauthorized.'));
 
-    const invoiceNameStr = 'invoice-' + orderID + '.pdf';
-    const invoicePath = path.join('data', 'invoices', invoiceNameStr);
-    
-    return _sendFile(invoiceNameStr, invoicePath);
-  }
+    const inputObj = {
+      request: request,
+      response: response,
+      next: next,
+      order: order
+    };
 
-  function _sendFile(invoiceNameStr, invoicePath) {
-    const file = fs.createReadStream(invoicePath);
-    
-    response.setHeader('Content-Type', 'application/pdf');
-    response.setHeader('Content-Disposition', 'inline; filename="' + invoiceNameStr + '"');
-    
-    return file.pipe(response);
+    return pdfGenerator.generateInvoicePDF(inputObj);
   }
 };
 
