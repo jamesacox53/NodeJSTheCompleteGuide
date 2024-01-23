@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const { validationResult } = require('express-validator');
 
 const adminRenderer = require(path.join('..', 'viewRenderers', 'adminRenderer.js'));
@@ -115,16 +116,18 @@ exports.postEditProduct = (request, response, next) => {
     const productID = request.body.productID;
   
     return Product.findById(productID)
-    .then(product => _ifProductIsCreatedByUserThenEdit(product, request, response));
+    .then(product => _ifProdCreatedByUserThenEdit(product, request, response));
   }
 
-  function _ifProductIsCreatedByUserThenEdit(product, request, response) {
+  function _ifProdCreatedByUserThenEdit(product, request, response) {
     if (product.userID.toString() !== request.user._id.toString()) {
       return response.redirect('/');
     }
 
+    const imageURL = product.imageURL;
+
     return _editProductAndSave(product, request)
-    .then(err => _gotoAdminProductPage(err, response))
+    .then(err => _cleanUpFilesAndRedirect(err, imageURL, response))
     .catch(err => _handleError(err));
   }
 
@@ -141,8 +144,23 @@ exports.postEditProduct = (request, response, next) => {
     return product.save();
   }
 
-  function _gotoAdminProductPage(err, response) {
+  function _cleanUpFilesAndRedirect(err, imageURL, response) {
+    _deleteFile(imageURL);
+
     return response.redirect('/admin/products');
+  }
+
+  function _deleteFile(path) {
+    if (!path) return;
+
+    const pathStr = path.toString();
+    if (!pathStr) return;
+
+    fs.unlink(pathStr, (err) => {
+      if (err) {
+        throw err;
+      }
+    });
   }
 
   function _handleError(err) {
@@ -174,14 +192,37 @@ exports.getProducts = (request, response, next) => {
 };
 
 exports.postDeleteProduct = (request, response, next) => {
-  const whereObj = {
-    _id: request.body.productID,
-    userID: request.user._id
-  };
+  const prodID = request.body.productID;
   
-  Product.deleteOne(whereObj)
+  Product.findById(prodID)
+  .then(product => _deleteProduct(product))
   .then(res => _redirectToAdminProducts(response))
   .catch(err => _handleError(err));
+
+  function _deleteProduct(product) {
+    const imageURL = product.imageURL;
+    _deleteFile(imageURL);
+
+    const whereObj = {
+      _id: product._id,
+      userID: request.user._id
+    };
+
+    return Product.deleteOne(whereObj);  
+  }
+
+  function _deleteFile(path) {
+    if (!path) return;
+
+    const pathStr = path.toString();
+    if (!pathStr) return;
+
+    fs.unlink(pathStr, (err) => {
+      if (err) {
+        throw err;
+      }
+    });
+  }
 
   function _redirectToAdminProducts(response) {
     response.redirect('/admin/products');
