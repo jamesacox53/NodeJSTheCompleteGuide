@@ -57,19 +57,31 @@ exports.getProduct = (request, response, next) => {
 
 exports.getIndex = (request, response, next) => {
   const page = request.query.page;
+
+  return Product.find()
+  .countDocuments()
+  .then(totalNumProds => _getIndex(page, totalNumProds));
   
-  Product.find()
-  .skip((page - 1) * ITEMS_PER_PAGE)
-  .limit(ITEMS_PER_PAGE)
-  .then(arr => _getProducts(arr, response))
-  .catch(err => _handleError(err));
-  
-  function _getProducts(arr, response) {
+  function _getIndex(page, totalNumProds) {
+    return Product.find()
+    .skip((page - 1) * ITEMS_PER_PAGE)
+    .limit(ITEMS_PER_PAGE)
+    .then(arr => _getProducts(arr, page, totalNumProds))
+    .catch(err => _handleError(err));
+  }
+
+  function _getProducts(arr, page, totalNumProds) {
     const optionsObj = {
       path: path,
       pageTitle: 'Shop',
       pathStr: '/',
-      prods: arr
+      prods: arr,
+      totalNumProds: totalNumProds,
+      hasNextPage: ITEMS_PER_PAGE * page < totalNumProds,
+      nextPage: page + 1,
+      hasPrevPage: ITEMS_PER_PAGE * page < totalNumProds,
+      prevPage: page - 1,
+      lastPage: Math.ceil(totalNumProds / ITEMS_PER_PAGE)
     };
   
     response.render(path.join('shop', 'index.ejs'), optionsObj);
