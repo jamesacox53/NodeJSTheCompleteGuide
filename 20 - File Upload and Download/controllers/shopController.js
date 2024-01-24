@@ -5,6 +5,8 @@ const pdfGenerator = require(path.join('..', 'utils', 'pdfGenerator', 'pdfGenera
 const Product = require(path.join('..', 'models', 'product.js'));
 const Order = require(path.join('..', 'models', 'order.js'));
 
+const ITEMS_PER_PAGE = 2;
+
 exports.getProducts = (request, response, next) => {
   Product.find()
   .then(arr => _getProducts(arr))
@@ -54,7 +56,11 @@ exports.getProduct = (request, response, next) => {
 };
 
 exports.getIndex = (request, response, next) => {
+  const page = request.query.page;
+  
   Product.find()
+  .skip((page - 1) * ITEMS_PER_PAGE)
+  .limit(ITEMS_PER_PAGE)
   .then(arr => _getProducts(arr, response))
   .catch(err => _handleError(err));
   
