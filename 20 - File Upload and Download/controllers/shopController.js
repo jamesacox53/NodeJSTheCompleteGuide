@@ -56,13 +56,13 @@ exports.getProduct = (request, response, next) => {
 };
 
 exports.getIndex = (request, response, next) => {
-  const page = request.query.page;
-
   return Product.find()
   .countDocuments()
-  .then(totalNumProds => _getIndex(page, totalNumProds));
+  .then(totalNumProds => _getIndex(totalNumProds));
   
-  function _getIndex(page, totalNumProds) {
+  function _getIndex(totalNumProds) {
+    const page = _getPageNum(totalNumProds);
+
     return Product.find()
     .skip((page - 1) * ITEMS_PER_PAGE)
     .limit(ITEMS_PER_PAGE)
@@ -70,21 +70,54 @@ exports.getIndex = (request, response, next) => {
     .catch(err => _handleError(err));
   }
 
+  function _getPageNum(totalNumProds) {
+    const page = request.query.page;
+    if (!page) return 1;
+
+    const pageNum = parseInt(page, 10);
+    if (pageNum < 1) return 1;
+
+    const numPages = Math.ceil(totalNumProds / ITEMS_PER_PAGE);
+    if (pageNum > numPages) return numPages;
+    
+    return pageNum;
+  }
+
   function _getProducts(arr, page, totalNumProds) {
+    const paginationPagesArr = _getPaginationPagesArr(page, totalNumProds);
+
     const optionsObj = {
       path: path,
       pageTitle: 'Shop',
       pathStr: '/',
       prods: arr,
-      totalNumProds: totalNumProds,
-      hasNextPage: ITEMS_PER_PAGE * page < totalNumProds,
-      nextPage: page + 1,
-      hasPrevPage: ITEMS_PER_PAGE * page < totalNumProds,
-      prevPage: page - 1,
-      lastPage: Math.ceil(totalNumProds / ITEMS_PER_PAGE)
+      currPage: page,
+      paginationPagesArr: paginationPagesArr
     };
   
     response.render(path.join('shop', 'index.ejs'), optionsObj);
+  }
+
+  function _getPaginationPagesArr(page, totalNumProds) {
+    const prevPage = page - 1;
+    const nextPage = page + 1;
+    const numPages = Math.ceil(totalNumProds / ITEMS_PER_PAGE);
+    
+    const pagesArr = [1]; 
+    
+    if (prevPage > 1 && prevPage < numPages)
+      pagesArr.push(prevPage);
+
+    if (page > 1 && page < numPages)
+      pagesArr.push(page);
+
+    if (nextPage > 1 && nextPage < numPages)
+      pagesArr.push(nextPage);
+    
+    if (numPages > 1)
+      pagesArr.push(numPages);
+    
+    return pagesArr;
   }
 
   function _handleError(err) {
