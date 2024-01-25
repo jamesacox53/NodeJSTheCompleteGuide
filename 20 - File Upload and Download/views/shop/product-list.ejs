@@ -38,8 +38,11 @@
                                     <% } %>
                                 </div>
                             </article>
-                            <% } %>
+                        <% } %>
                     </div>
+                    <section class="pagination">
+                        <%- include(path.join('..', 'includes', 'pagination.ejs')) %>
+                    </section>
                     <% } else { %>
                         <h1>No Products Found!</h1>
                         <% } %>

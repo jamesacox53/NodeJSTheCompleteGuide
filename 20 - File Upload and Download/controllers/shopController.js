@@ -4,20 +4,36 @@ const fs = require('fs');
 const pdfGenerator = require(path.join('..', 'utils', 'pdfGenerator', 'pdfGenerator.js'));
 const Product = require(path.join('..', 'models', 'product.js'));
 const Order = require(path.join('..', 'models', 'order.js'));
+const controllerUtils = require(path.join('..', 'utils', 'controllerUtils', 'controllerUtils.js'));
 
 const ITEMS_PER_PAGE = 2;
 
 exports.getProducts = (request, response, next) => {
-  Product.find()
-  .then(arr => _getProducts(arr))
+  return Product.find()
+  .countDocuments()
+  .then(totalNumProds => _getProducts(totalNumProds))
   .catch(err => _handleError(err));
   
-  function _getProducts(arr) {
+  function _getProducts(totalNumProds) {
+    const page = controllerUtils.getPageNum(request, ITEMS_PER_PAGE, totalNumProds);
+
+    return Product.find()
+    .skip((page - 1) * ITEMS_PER_PAGE)
+    .limit(ITEMS_PER_PAGE)
+    .then(arr => _getProds(arr, page, totalNumProds))
+    .catch(err => _handleError(err));
+  }
+
+  function _getProds(arr, page, totalNumProds) {
+    const paginationPagesArr = controllerUtils.getPaginationPagesArr(page, ITEMS_PER_PAGE, totalNumProds);
+
     const optionsObj = {
       path: path,
       pageTitle: 'All Products',
       pathStr: '/products',
-      prods: arr
+      prods: arr,
+      currPage: page,
+      paginationPagesArr: paginationPagesArr
     };
   
     response.render(path.join('shop', 'product-list.ejs'), optionsObj);
@@ -61,7 +77,7 @@ exports.getIndex = (request, response, next) => {
   .then(totalNumProds => _getIndex(totalNumProds));
   
   function _getIndex(totalNumProds) {
-    const page = _getPageNum(totalNumProds);
+    const page = controllerUtils.getPageNum(request, ITEMS_PER_PAGE, totalNumProds);
 
     return Product.find()
     .skip((page - 1) * ITEMS_PER_PAGE)
@@ -70,21 +86,8 @@ exports.getIndex = (request, response, next) => {
     .catch(err => _handleError(err));
   }
 
-  function _getPageNum(totalNumProds) {
-    const page = request.query.page;
-    if (!page) return 1;
-
-    const pageNum = parseInt(page, 10);
-    if (pageNum < 1) return 1;
-
-    const numPages = Math.ceil(totalNumProds / ITEMS_PER_PAGE);
-    if (pageNum > numPages) return numPages;
-    
-    return pageNum;
-  }
-
   function _getProducts(arr, page, totalNumProds) {
-    const paginationPagesArr = _getPaginationPagesArr(page, totalNumProds);
+    const paginationPagesArr = controllerUtils.getPaginationPagesArr(page, ITEMS_PER_PAGE, totalNumProds);
 
     const optionsObj = {
       path: path,
@@ -96,28 +99,6 @@ exports.getIndex = (request, response, next) => {
     };
   
     response.render(path.join('shop', 'index.ejs'), optionsObj);
-  }
-
-  function _getPaginationPagesArr(page, totalNumProds) {
-    const prevPage = page - 1;
-    const nextPage = page + 1;
-    const numPages = Math.ceil(totalNumProds / ITEMS_PER_PAGE);
-    
-    const pagesArr = [1]; 
-    
-    if (prevPage > 1 && prevPage < numPages)
-      pagesArr.push(prevPage);
-
-    if (page > 1 && page < numPages)
-      pagesArr.push(page);
-
-    if (nextPage > 1 && nextPage < numPages)
-      pagesArr.push(nextPage);
-    
-    if (numPages > 1)
-      pagesArr.push(numPages);
-    
-    return pagesArr;
   }
 
   function _handleError(err) {

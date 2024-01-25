@@ -34,13 +34,7 @@
                 <% } %>
             </div>
             <section class="pagination">
-                <% for (const page of paginationPagesArr) { %>
-                    <% if (page == currPage) { %>
-                        <a class="active" href="/?page=<%= page %>"><%= page %></a>
-                    <% } else { %>
-                        <a href="/?page=<%= page %>"><%= page %></a>
-                    <% } %>
-                <% } %>
+                <%- include(path.join('..', 'includes', 'pagination.ejs')) %>
             </section>
         <% } else { %>
             <h1>No Products Found!</h1>
