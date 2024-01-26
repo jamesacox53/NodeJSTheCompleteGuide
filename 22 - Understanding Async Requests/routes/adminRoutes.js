@@ -13,6 +13,6 @@ router.get('/admin/products', isAuth, adminController.getProducts);
 
 router.post('/admin/add-product', isAuth, productValidators.productValidatorsArr, adminController.postAddProduct);
 router.post('/admin/edit-product', isAuth, productValidators.productValidatorsArr, adminController.postEditProduct);
-router.post('/admin/delete-product', isAuth, adminController.postDeleteProduct);
+router.delete('/admin/delete-product/:productID', isAuth, adminController.deleteProduct);
 
 module.exports = router;

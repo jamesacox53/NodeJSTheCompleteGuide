@@ -191,12 +191,12 @@ exports.getProducts = (request, response, next) => {
   }
 };
 
-exports.postDeleteProduct = (request, response, next) => {
-  const prodID = request.body.productID;
+exports.deleteProduct = (request, response, next) => {
+  const prodID = request.params.productID;
   
   Product.findById(prodID)
   .then(product => _deleteProduct(product))
-  .then(res => _redirectToAdminProducts(response))
+  .then(res => _sendJSONResponse())
   .catch(err => _handleError(err));
 
   function _deleteProduct(product) {
@@ -224,13 +224,11 @@ exports.postDeleteProduct = (request, response, next) => {
     });
   }
 
-  function _redirectToAdminProducts(response) {
-    response.redirect('/admin/products');
+  function _sendJSONResponse() {
+    response.status(200).json({message:'Success'});
   }
 
   function _handleError(err) {
-    const error = new Error(err);
-    error.httpStatusCode = 500;
-    return next(error);
+    response.status(500).json({message:'Failure'});
   }
 };
