@@ -1,0 +1,7 @@
+<% for (const page of paginationPagesArr) { %>
+    <% if (page == currPage) { %>
+        <a class="active" href="?page=<%= page %>"><%= page %></a>
+    <% } else { %>
+        <a href="?page=<%= page %>"><%= page %></a>
+    <% } %>
+<% } %>
