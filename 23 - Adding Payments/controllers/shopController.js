@@ -241,21 +241,42 @@ exports.getInvoice = (request, response, next) => {
   }
 };
 
-/*
 exports.getCheckout = (request, response, next) => {
-  Product.findAll()
-  .then(arr => _getProducts(arr, response))
-  .catch(err => console.log(err));
+  request.user.getCart()
+  .then(cart => _renderCheckoutPage(cart))
+  .catch(err => _handleError(err));
   
-  function _getProducts(arr, response) {
+  function _renderCheckoutPage(cart) {
+    const totalPrice = _calculateTotalPrice(cart);
+
     const optionsObj = {
       path: path,
       pageTitle: 'Checkout',
       pathStr: '/checkout',
-      prods: arr
+      cart: cart,
+      totalPrice: totalPrice
     };
-  
+    
     response.render(path.join('shop', 'checkout.ejs'), optionsObj);
   }
+
+  function _calculateTotalPrice(cart) {
+    const items = cart.items;
+    let totalPrice = 0;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+
+      const cost = item.quantity * item.productID.price;
+      totalPrice += cost;
+    }
+
+    return totalPrice;
+  }
+
+  function _handleError(err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(err);
+  }
 };
-*/

@@ -10,7 +10,7 @@ router.get('/products', shopController.getProducts);
 router.get('/cart', isAuth, shopController.getCart);
 router.get('/orders', isAuth, shopController.getOrders);
 router.get('/orders/invoices/:orderID', isAuth, shopController.getInvoice);
-// router.get('/checkout', shopController.getCheckout);
+router.get('/checkout', isAuth, shopController.getCheckout);
 router.get('/', shopController.getIndex);
 
 router.post('/cart', isAuth, shopController.postCart);

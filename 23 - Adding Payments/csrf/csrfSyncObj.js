@@ -3,6 +3,9 @@ const csrfSyncOptionsObj =  {
     // return req.body["CSRFToken"];
   // }
   getTokenFromRequest: (req) => {
+    const bodyToken = req.body["CSRFToken"];
+    if (bodyToken) return bodyToken;
+    
     return req.headers["x-csrf-token"];
   }
 };
