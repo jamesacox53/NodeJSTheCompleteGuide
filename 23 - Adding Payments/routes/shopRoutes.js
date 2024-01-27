@@ -10,11 +10,13 @@ router.get('/products', shopController.getProducts);
 router.get('/cart', isAuth, shopController.getCart);
 router.get('/orders', isAuth, shopController.getOrders);
 router.get('/orders/invoices/:orderID', isAuth, shopController.getInvoice);
+router.get('/checkout/success', isAuth, shopController.getCheckoutSuccess);
+router.get('/checkout/cancel', isAuth, shopController.getCheckout);
 router.get('/checkout', isAuth, shopController.getCheckout);
 router.get('/', shopController.getIndex);
 
 router.post('/cart', isAuth, shopController.postCart);
 router.post('/cart-delete-item', isAuth, shopController.postCartDeleteItem);
-router.post('/create-order', isAuth, shopController.postOrder);
+// router.post('/create-order', isAuth, shopController.postOrder);
 
 module.exports = router;

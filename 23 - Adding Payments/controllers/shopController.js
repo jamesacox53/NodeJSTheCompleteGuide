@@ -6,6 +6,9 @@ const Product = require(path.join('..', 'models', 'product.js'));
 const Order = require(path.join('..', 'models', 'order.js'));
 const controllerUtils = require(path.join('..', 'utils', 'controllerUtils', 'controllerUtils.js'));
 
+const stripeObj = require(path.join('..', 'sensitive', 'stripeObj.js'));
+const stripe = require('stripe')(stripeObj.secretKey);
+
 const ITEMS_PER_PAGE = 2;
 
 exports.getProducts = (request, response, next) => {
@@ -191,7 +194,7 @@ exports.getOrders = (request, response, next) => {
   }
 };
 
-exports.postOrder = (request, response, next) => {
+exports.getCheckoutSuccess = (request, response, next) => {
   request.user.populate('cart.items.productID')
   .then(user => _createOrder(user))
   .then(order => request.user.clearCart())
@@ -242,26 +245,64 @@ exports.getInvoice = (request, response, next) => {
 };
 
 exports.getCheckout = (request, response, next) => {
+  let userCart;
+
   request.user.getCart()
-  .then(cart => _renderCheckoutPage(cart))
+  .then(cart => { userCart = cart })
+  .then(err => _getStripeSession(userCart))
+  .then(session => _renderCheckoutPage(session))
   .catch(err => _handleError(err));
   
-  function _renderCheckoutPage(cart) {
-    const totalPrice = _calculateTotalPrice(cart);
+  function _getStripeSession(userCart) {
+    const successURL = request.protocol + '://' + request.get('host') + '/checkout/success';
+    const cancelURL = request.protocol + '://' + request.get('host') + '/checkout/cancel';
+
+    const stripeSessionObj = {
+      payment_method_types: ['card'],
+      line_items: _getStripeLineItemsArr(userCart),
+      mode: 'payment',
+      success_url: successURL,
+      cancel_url: cancelURL
+    };
+
+    return stripe.checkout.sessions.create(stripeSessionObj);
+  }
+
+  function _getStripeLineItemsArr(userCart) {
+    const items = userCart.items;
+
+    return items.map(item => {
+      return {
+        price_data: {
+          currency: 'usd',
+          unit_amount: item.productID.price * 100,
+          product_data: {
+            name: item.productID.title,
+            description: item.productID.description
+          }  
+        },
+        quantity: item.quantity
+      };
+    });
+  }
+
+  function _renderCheckoutPage(session) {
+    const totalPrice = _calculateTotalPrice(userCart);
 
     const optionsObj = {
       path: path,
       pageTitle: 'Checkout',
       pathStr: '/checkout',
-      cart: cart,
-      totalPrice: totalPrice
+      cart: userCart,
+      totalPrice: totalPrice,
+      sessionID: session.id
     };
     
     response.render(path.join('shop', 'checkout.ejs'), optionsObj);
   }
 
-  function _calculateTotalPrice(cart) {
-    const items = cart.items;
+  function _calculateTotalPrice(userCart) {
+    const items = userCart.items;
     let totalPrice = 0;
 
     for (let i = 0; i < items.length; i++) {
