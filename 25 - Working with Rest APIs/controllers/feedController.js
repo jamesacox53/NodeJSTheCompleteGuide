@@ -1,7 +1,7 @@
 exports.getPosts = (request, response, next) => {
     response.status(200).json({
         posts: [
-            { 
+            {
                 _id: '1',
                 title: 'First Post',
                 content: 'This is the first post!',
@@ -23,7 +23,11 @@ exports.createPost = (request, response, next) => {
         post: { 
             id: new Date().getTime().toString(),
             title: title,
-            content: content
+            content: content,
+            creator: {
+                name: 'James'
+            },
+            createdAt: new Date()
         }
     });
 };
