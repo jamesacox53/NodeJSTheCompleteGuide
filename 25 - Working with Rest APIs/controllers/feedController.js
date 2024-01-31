@@ -31,13 +31,10 @@ exports.createPost = (request, response, next) => {
     }
 
     function _validationError(errors) {
-        const errorsArr = errors.array();
-        const body = {
-            message: 'Validation failed, entered data is incorrect.',
-            errors: errorsArr
-        }
-
-        return response.status(422).json(body);
+        const error = new Error('Validation failed, entered data is incorrect.');
+        error.u_statusCode = 422;
+        
+        throw error;
     }
 
     function _createPost() {
@@ -52,7 +49,7 @@ exports.createPost = (request, response, next) => {
 
         return post.save()
         .then(result => _sendResponse(result))
-        .catch(err => console.log(err));
+        .catch(err => _saveError(err));
     }
 
     function _sendResponse(result) {
@@ -60,5 +57,12 @@ exports.createPost = (request, response, next) => {
             message: 'Post created successfully!',
             post: result
         });
+    }
+
+    function _saveError(err) {
+        if (!err.u_statusCode)
+            err.u_statusCode = 500;
+
+        next(err);
     }
 };
