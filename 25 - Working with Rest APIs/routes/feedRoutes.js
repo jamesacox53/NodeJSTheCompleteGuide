@@ -6,6 +6,7 @@ const feedController = require(path.join('..', 'controllers', 'feedController'))
 
 const router = express.Router();
 
+router.get('/post/:postID', feedController.getPost);
 router.get('/feed/posts', feedController.getPosts);
 
 router.post('/feed/post', feedValidators.createPostValidatorArr, feedController.createPost);

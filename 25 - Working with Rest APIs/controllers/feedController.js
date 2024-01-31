@@ -3,20 +3,64 @@ const { validationResult } = require('express-validator');
 
 const Post = require(path.join('..', 'models', 'post.js'));
 
+exports.getPost = (request, response, next) => {
+    _getPost();
+
+    function _getPost() {
+        const postID = request.params.postID;
+
+        return Post.findById(postID)
+        .then(post => _ifPostExistsSendResponse(post))
+        .catch(err => _error(err));
+    }
+
+    function _ifPostExistsSendResponse(post) {
+        if (!post) {
+            const error = new Error('Could not find post.');
+            error.u_statusCode = 404;
+
+            throw error;
+        }
+
+        return _sendResponse(post);
+    }
+
+    function _sendResponse(post) {
+        return response.status(200).json({
+            message: 'Post fetched.',
+            post: post
+        });
+    }
+
+    function _error(err) {
+        if (!err.u_statusCode)
+            err.u_statusCode = 500;
+
+        next(err);
+    }
+};
+
 exports.getPosts = (request, response, next) => {
-    response.status(200).json({
-        posts: [
-            {
-                _id: '1',
-                title: 'First Post',
-                content: 'This is the first post!',
-                creator: {
-                    name: 'James'
-                },
-                date: new Date()
-            }
-        ]
-    });
+    _getPosts();
+
+    function _getPosts() {
+        Post.find()
+        .then(posts => _sendResponse(posts))
+        .catch(err => _error(err));
+    }
+
+    function _sendResponse(posts) {
+        return response.status(200).json({
+            posts: posts
+        });
+    }
+
+    function _error(err) {
+        if (!err.u_statusCode)
+            err.u_statusCode = 500;
+
+        next(err);
+    }
 };
 
 exports.createPost = (request, response, next) => {
