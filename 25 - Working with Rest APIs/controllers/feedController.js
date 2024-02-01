@@ -71,6 +71,9 @@ exports.createPost = (request, response, next) => {
         if (!errors.isEmpty())
             return _validationError(errors);
 
+        if (!request.file)
+            return _noImageError();
+
         return _createPost();
     }
 
@@ -80,12 +83,19 @@ exports.createPost = (request, response, next) => {
         
         throw error;
     }
+    
+    function _noImageError() {
+        const error = new Error('No image provided.');
+        error.u_statusCode = 422;
+
+        throw error;
+    }
 
     function _createPost() {
         const post = new Post({
             title: request.body.title,
             content: request.body.content,
-            imageURL: request.body.imageURL,
+            imageURL: request.file.path,
             creator: {
                 name: 'James'
             },

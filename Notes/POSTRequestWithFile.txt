@@ -1,0 +1,12 @@
+When you create a POST request that in the body contains a file you need to use the formData class.
+write the code:
+const formData = new FormData();
+formData.append('title', postData.title);
+formData.append('content', postData.content);
+formData.append('image', postData.image);
+
+fetch(url, {
+	body: formData
+}).then(...).catch(...);
+
+This allows you to include multiple types instead of just JSON.
