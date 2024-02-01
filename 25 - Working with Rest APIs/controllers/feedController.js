@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const { validationResult } = require('express-validator');
 
 const Post = require(path.join('..', 'models', 'post.js'));
@@ -118,5 +119,90 @@ exports.createPost = (request, response, next) => {
             err.u_statusCode = 500;
 
         next(err);
+    }
+};
+
+exports.putEditPost = (request, response, next) => {
+    _putEditPost();
+  
+    function _putEditPost() {
+      const errors = validationResult(request);
+      
+      if (!errors.isEmpty())
+        return _validationError(errors);
+      
+      return _editPost();
+    }
+
+    function _validationError(errors) {
+        const error = new Error('Validation failed, entered data is incorrect.');
+        error.u_statusCode = 422;
+        
+        throw error;
+    }
+    
+    function _editPost() {
+        const postID = request.params.postID;
+        const newImageURL = _getNewImageURL();
+        let oldImageURL;
+        let post;
+        
+        return Post.findById(postID)
+        .then(userPost => { post = userPost })
+        .then(err => { oldImageURL = post.imageURL })
+        .then(err => _editPostAndSave(post, newImageURL))
+        .then(userPost => _cleanUpFilesAndSendResponse(userPost, newImageURL, oldImageURL))
+        .catch(err => _handleError(err));
+    }
+
+    function _getNewImageURL() {
+        const bodyImageURL = request.body.imageURL;
+        if (bodyImageURL) return bodyImageURL;
+
+        const fileImageURL = request.file.path;
+        if (fileImageURL) return fileImageURL;
+
+        const error = new Error('Error with file.');
+        error.u_statusCode = 422;
+
+        throw error;
+    }
+
+    function _editPostAndSave(post, newImageURL) {
+        post.title = request.body.title;
+        post.imageURL = newImageURL;
+        post.content = request.body.content;
+
+        return post.save();
+    }
+
+    function _cleanUpFilesAndSendResponse(userPost, newImageURL, oldImageURL) {
+        if (newImageURL !== oldImageURL)
+            _deleteFile(oldImageURL);
+
+        return response.status(200).json({
+            message: 'Post successfully updated.',
+            post: userPost
+        });
+    }
+
+    function _deleteFile(path) {
+        if (!path) return;
+
+        const pathStr = path.toString();
+        if (!pathStr) return;
+
+        fs.unlink(pathStr, (err) => {
+        if (err) {
+            throw err;
+        }
+        });
+    }
+
+    function _handleError(err) {
+        if (!err.u_statusCode)
+            err.u_statusCode = 500;
+
+        return next(err);
     }
 };

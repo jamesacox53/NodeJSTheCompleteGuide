@@ -6,3 +6,4 @@ const titleValidator = body('title', 'Title is invalid.').trim().isLength({ min:
 const contentValidator = body('content', 'Content is invalid.').trim().isLength({ min: 5 });
 
 exports.createPostValidatorArr = [titleValidator, contentValidator];
+exports.editPostValidatorArr = [titleValidator, contentValidator];
