@@ -3,6 +3,9 @@ const fs = require('fs');
 const { validationResult } = require('express-validator');
 
 const Post = require(path.join('..', 'models', 'post.js'));
+const controllerUtils = require(path.join('..', 'utils', 'controllerUtils', 'controllerUtils.js'));
+
+const ITEMS_PER_PAGE = 2;
 
 exports.getPost = (request, response, next) => {
     _getPost();
@@ -45,22 +48,34 @@ exports.getPosts = (request, response, next) => {
     _getPosts();
 
     function _getPosts() {
-        Post.find()
-        .then(posts => _sendResponse(posts))
-        .catch(err => _error(err));
+        return Post.find()
+        .countDocuments()
+        .then(totalNumPosts => _getPagePosts(totalNumPosts))
+        .catch(err => _handleError(err));   
+    }
+        
+    function _getPagePosts(totalNumPosts) {
+        const page = controllerUtils.getPageNum(request, ITEMS_PER_PAGE, totalNumPosts);
+
+        return Post.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE)
+        .then(postsArr => _sendResponse(postsArr, totalNumPosts))
+        .catch(err => _handleError(err));
     }
 
-    function _sendResponse(posts) {
+    function _sendResponse(postsArr, totalNumPosts) {
         return response.status(200).json({
-            posts: posts
+            posts: postsArr,
+            totalItems: totalNumPosts
         });
     }
 
-    function _error(err) {
+    function _handleError(err) {
         if (!err.u_statusCode)
             err.u_statusCode = 500;
 
-        next(err);
+        return next(err);
     }
 };
 
