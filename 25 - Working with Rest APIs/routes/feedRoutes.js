@@ -2,7 +2,7 @@ const path = require('path');
 const express = require('express');
 
 const feedValidators = require(path.join('..', 'utils', 'validators', 'feedValidators.js'));
-const feedController = require(path.join('..', 'controllers', 'feedController'));
+const feedController = require(path.join('..', 'controllers', 'feedController.js'));
 
 const router = express.Router();
 
