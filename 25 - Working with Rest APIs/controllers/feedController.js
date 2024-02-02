@@ -143,16 +143,25 @@ exports.putEditPost = (request, response, next) => {
     
     function _editPost() {
         const postID = request.params.postID;
-        const newImageURL = _getNewImageURL();
-        let oldImageURL;
-        let post;
         
         return Post.findById(postID)
-        .then(userPost => { post = userPost })
-        .then(err => { oldImageURL = post.imageURL })
-        .then(err => _editPostAndSave(post, newImageURL))
-        .then(userPost => _cleanUpFilesAndSendResponse(userPost, newImageURL, oldImageURL))
+        .then(post => _ifPostExistsEdit(post, postID))
         .catch(err => _handleError(err));
+    }
+
+    function _ifPostExistsEdit(post, postID) {
+        if (!post) {
+            const error = new Error(`Can't find post with ID ${postID}`);
+            error.u_statusCode = 422;
+
+            throw error;
+        }
+
+        const newImageURL = _getNewImageURL();
+        let oldImageURL = post.imageURL;
+
+        return _editPostAndSave(post, newImageURL)
+        .then(editedPost => _cleanUpFilesAndSendResponse(editedPost, newImageURL, oldImageURL));
     }
 
     function _getNewImageURL() {
@@ -176,13 +185,13 @@ exports.putEditPost = (request, response, next) => {
         return post.save();
     }
 
-    function _cleanUpFilesAndSendResponse(userPost, newImageURL, oldImageURL) {
+    function _cleanUpFilesAndSendResponse(editedPost, newImageURL, oldImageURL) {
         if (newImageURL !== oldImageURL)
             _deleteFile(oldImageURL);
 
         return response.status(200).json({
             message: 'Post successfully updated.',
-            post: userPost
+            post: editedPost
         });
     }
 
@@ -193,9 +202,63 @@ exports.putEditPost = (request, response, next) => {
         if (!pathStr) return;
 
         fs.unlink(pathStr, (err) => {
-        if (err) {
-            throw err;
+            if (err) {
+                throw err;
+            }
+        });
+    }
+
+    function _handleError(err) {
+        if (!err.u_statusCode)
+            err.u_statusCode = 500;
+
+        return next(err);
+    }
+};
+
+exports.deletePost = (request, response, next) => {
+    _deletePost();
+  
+    function _deletePost() {
+        const postID = request.params.postID;
+        
+        return Post.findById(postID)
+        .then(post => _ifPostExistsDelete(post, postID))
+        .catch(err => _handleError(err));
+    }
+
+    function _ifPostExistsDelete(post, postID) {
+        if (!post) {
+            const error = new Error(`Can't find post with ID ${postID}`);
+            error.u_statusCode = 422;
+
+            throw error;
         }
+
+        const imageURL = post.imageURL;
+
+        return Post.deleteOne({ _id: post._id })
+        .then(err => _cleanUpFilesAndSendResponse(imageURL));
+    }
+
+    function _cleanUpFilesAndSendResponse(imageURL) {
+        _deleteFile(imageURL);
+
+        return response.status(200).json({
+            message: 'Post successfully deleted.'
+        });
+    }
+
+    function _deleteFile(path) {
+        if (!path) return;
+
+        const pathStr = path.toString();
+        if (!pathStr) return;
+
+        fs.unlink(pathStr, (err) => {
+            if (err) {
+                throw err;
+            }
         });
     }
 
