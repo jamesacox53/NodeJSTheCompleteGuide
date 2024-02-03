@@ -68,9 +68,9 @@ exports.putSignUp = (request, response, next) => {
     }
     
     function _handleError(err) {
-        if (!err.u_statusCode)
-            err.u_statusCode = 500;
+      if (!err.u_statusCode)
+        err.u_statusCode = 500;
 
-        return next(err);
+      return next(err);
     }
   };

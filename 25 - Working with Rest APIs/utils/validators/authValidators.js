@@ -29,5 +29,5 @@ const nameValidator = body('name',
 .trim()
 .isLength({ min: 2 });
 
-exports.loginValidatorsArr = [emailValidator, passwordValidator];
 exports.signupValidatorsArr = [emailValidator, emailAlreadyExistsValidator, passwordValidator, nameValidator];
+exports.loginValidatorsArr = [emailValidator, passwordValidator];
