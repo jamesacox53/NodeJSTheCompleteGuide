@@ -63,7 +63,7 @@ exports.putSignUp = (request, response, next) => {
     function _sendResponse(user) {
         return response.status(201).json({
             message: 'User created successfully!',
-            user: user
+            userId: user._id.toString()
         });
     }
     
