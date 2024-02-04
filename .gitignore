@@ -10,6 +10,7 @@ mongooseDBConnectionStr.js
 gmailCredsObj.js
 testEmailAccsObj.js
 stripeObj.js
+jsonWebTokenSecretStr.js
 images/
 invoices/
 

@@ -1,8 +1,10 @@
 const path = require('path');
 const bcryptjs = require('bcryptjs');
 const { validationResult } = require('express-validator');
+const jsonwebtoken = require('jsonwebtoken');
 
 const User = require(path.join('..', '..', 'models', 'user.js'));
+const jsonWebTokenSecretStr = require(path.join('..', '..', 'sensitive', 'jsonWebTokenSecretStr.js'));
 
 exports.postLogin = (request, response, next) => {
     _postLogin();
@@ -29,11 +31,11 @@ exports.postLogin = (request, response, next) => {
       };
           
       return User.findOne({ 'email': loginObj.emailStr })
-      .then(user => _postLogin(user, loginObj))
+      .then(user => _loginUser(user, loginObj))
       .catch(err => _handleError(err));
     }
       
-    function _postLogin(user, loginObj) {
+    function _loginUser(user, loginObj) {
       if (!user) {
         return response.status(401).json({
             message: "User doesn't exist."
@@ -41,7 +43,7 @@ exports.postLogin = (request, response, next) => {
       }
   
       return _isCorrectPassword(user, loginObj)
-      .then(isCorrect => _loginOrRedirect(isCorrect, user));
+      .then(isCorrect => _sendLoginResponse(isCorrect, user));
     }
     
     function _isCorrectPassword(user, loginObj) {
@@ -61,16 +63,28 @@ exports.postLogin = (request, response, next) => {
       return _sendJWTResponse(user);
     }
     
-    function _sendJWTResponse(user) {
-        return response.status(201).json({
-            message: "Correct user."
-        });
+    function _sendJWTResponse(user) {  
+      const payloadObj = {
+        email: user.email,
+        userId: user._id.toString()
+      };
+
+      const optionsObj = {
+        expiresIn: '1h'
+      };
+
+      const token = jsonwebtoken.sign(payloadObj, jsonWebTokenSecretStr, optionsObj);
+
+      return response.status(201).json({
+        token: token,
+        userId: user._id.toString()
+      }); 
     }
   
     function _handleError(err) {
-        if (!err.u_statusCode)
-          err.u_statusCode = 500;
+      if (!err.u_statusCode)
+        err.u_statusCode = 500;
   
-        return next(err);
+      return next(err);
     }
 };
