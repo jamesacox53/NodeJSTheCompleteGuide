@@ -1,2 +1,11 @@
 I think I need to do some research on JSON Web Tokens. The lecturer said that there is dedicated storage in the browser for JWTs. 
 I think he did it in his React app. I need to do some research on where JWTs are stored in the browser.
+
+To send a JWT token in a request you need to send it in the headers as part of the Authorization header. The Authorization header needs to be 'Bearer ' + webToken.
+For example:
+fetch(URL, {
+	headers: {
+		Authorization: 'Bearer ' + webToken
+	},
+	...
+});
