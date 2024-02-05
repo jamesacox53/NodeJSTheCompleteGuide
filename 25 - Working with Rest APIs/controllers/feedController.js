@@ -3,6 +3,7 @@ const fs = require('fs');
 const { validationResult } = require('express-validator');
 
 const Post = require(path.join('..', 'models', 'post.js'));
+const User = require(path.join('..', 'models', 'user.js'));
 const controllerUtils = require(path.join('..', 'utils', 'controllerUtils', 'controllerUtils.js'));
 
 const ITEMS_PER_PAGE = 2;
@@ -90,7 +91,8 @@ exports.createPost = (request, response, next) => {
         if (!request.file)
             return _noImageError();
 
-        return _createPost();
+        return User.findById(request.userID)
+        .then(user => _createPost(user))
     }
 
     function _validationError(errors) {
@@ -107,33 +109,53 @@ exports.createPost = (request, response, next) => {
         throw error;
     }
 
-    function _createPost() {
+    function _createPost(user) {
+        if (!user) {
+            const error = new Error("User doens't exist.")
+            error.u_statusCode = 401;
+
+            throw error;
+        }
+        
         const post = new Post({
             title: request.body.title,
             content: request.body.content,
             imageURL: request.file.path,
-            creator: {
-                name: 'James'
-            },
+            creator: user._id,
         });
 
         return post.save()
-        .then(result => _sendResponse(result))
-        .catch(err => _saveError(err));
+        .then(result => _updateUserAndSendResponse(result, user))
+        .catch(err => _handleError(err));
     }
 
-    function _sendResponse(result) {
+    function _updateUserAndSendResponse(post, user) {
+        if (!post) {
+            const error = new Error("Post couldn't be saved.")
+            error.u_statusCode = 401;
+
+            throw error;
+        }
+
+        user.posts.push(post._id);
+        return user.save()
+        .then(result => _sendResponse(result, post));
+    }
+
+    function _sendResponse(user, post) {
         return response.status(201).json({
             message: 'Post created successfully!',
-            post: result
+            post: post,
+            userId: user._id.toString(),
+            userName: user.name.toString()
         });
     }
 
-    function _saveError(err) {
+    function _handleError(err) {
         if (!err.u_statusCode)
             err.u_statusCode = 500;
 
-        next(err);
+        return next(err);
     }
 };
 
