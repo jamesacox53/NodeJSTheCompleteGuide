@@ -13,6 +13,7 @@ const errorHandler = require(path.join(rootDirectoryStr, 'utils', 'errorHandlers
 const multerOpts = require(path.join(rootDirectoryStr, 'utils', 'multerOpts', 'multerOpts.js'));
 
 const authRoutes = require(path.join(rootDirectoryStr, 'routes', 'authRoutes.js'));
+const userRoutes = require(path.join(rootDirectoryStr, 'routes', 'userRoutes.js'));
 const feedRoutes = require(path.join(rootDirectoryStr, 'routes', 'feedRoutes.js'));
 const fileStorage = multer.diskStorage(multerOpts.fileStorageObj);
 
@@ -23,6 +24,7 @@ app.use('images', express.static(path.join(rootDirectoryStr, 'images')));
 app.use(corsHeaders);
 
 app.use(authRoutes);
+app.use(userRoutes);
 app.use(feedRoutes);
 
 errorHandler.addErrorHandlers(app);
