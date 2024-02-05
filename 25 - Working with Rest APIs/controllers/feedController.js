@@ -300,10 +300,21 @@ exports.deletePost = (request, response, next) => {
     }
 
     function _afterCheckDeletePost(post) {
+        const creatorID = post.creator.toString();
+        const postID = post._id.toString();
         const imageURL = post.imageURL;
-
+        
         return Post.deleteOne({ _id: post._id })
-        .then(err => _cleanUpFilesAndSendResponse(imageURL));
+        .then(err => User.findById(creatorID))
+        .then(user => _removePostFromCreator(user, postID))
+        .then(err => _cleanUpFilesAndSendResponse(imageURL))
+        .catch(err => _handleError(err));
+    }
+
+    function _removePostFromCreator(user, postID) {
+        user.posts.pull(postID);
+
+        return user.save();
     }
 
     function _cleanUpFilesAndSendResponse(imageURL) {
