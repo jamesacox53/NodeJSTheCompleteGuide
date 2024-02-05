@@ -182,11 +182,11 @@ exports.putEditPost = (request, response, next) => {
         const postID = request.params.postID;
         
         return Post.findById(postID)
-        .then(post => _ifPostExistsEdit(post, postID))
+        .then(post => _checkPostAndEdit(post, postID))
         .catch(err => _handleError(err));
     }
 
-    function _ifPostExistsEdit(post, postID) {
+    function _checkPostAndEdit(post, postID) {
         if (!post) {
             const error = new Error(`Can't find post with ID ${postID}`);
             error.u_statusCode = 422;
@@ -194,6 +194,20 @@ exports.putEditPost = (request, response, next) => {
             throw error;
         }
 
+        const creatorID = post.creator.toString();
+        const userID = request.userID.toString();
+
+        if (creatorID !== userID) {
+            const error = new Error(`User with ID ${userID} didn't create post.`);
+            error.u_statusCode = 403;
+
+            throw error;
+        }
+
+        return _afterCheckEditPost(post);
+    }
+
+    function _afterCheckEditPost(post) {
         const newImageURL = _getNewImageURL();
         let oldImageURL = post.imageURL;
 
@@ -260,11 +274,11 @@ exports.deletePost = (request, response, next) => {
         const postID = request.params.postID;
         
         return Post.findById(postID)
-        .then(post => _ifPostExistsDelete(post, postID))
+        .then(post => _checkPostAndDelete(post, postID))
         .catch(err => _handleError(err));
     }
 
-    function _ifPostExistsDelete(post, postID) {
+    function _checkPostAndDelete(post, postID) {
         if (!post) {
             const error = new Error(`Can't find post with ID ${postID}`);
             error.u_statusCode = 422;
@@ -272,6 +286,20 @@ exports.deletePost = (request, response, next) => {
             throw error;
         }
 
+        const creatorID = post.creator.toString();
+        const userID = request.userID.toString();
+
+        if (creatorID !== userID) {
+            const error = new Error(`User with ID ${userID} didn't create post.`);
+            error.u_statusCode = 403;
+
+            throw error;
+        }
+
+        return _afterCheckDeletePost(post);
+    }
+
+    function _afterCheckDeletePost(post) {
         const imageURL = post.imageURL;
 
         return Post.deleteOne({ _id: post._id })
