@@ -13,7 +13,7 @@
             "name": "Run Script: start",
             "request": "launch",
             "command": "npm run start",
-            "cwd": "${workspaceFolder}\\25 - Working with Rest APIs"
+            "cwd": "${workspaceFolder}\\27 - Understanding Websockets"
         }
     ]
 }
