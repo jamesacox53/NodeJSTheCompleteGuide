@@ -11,7 +11,7 @@ const connectionStr = require(path.join(rootDirectoryStr, 'sensitive', 'mongoose
 const corsHeaders = require(path.join(rootDirectoryStr, 'utils', 'middleware', 'corsHeaders.js'));
 const errorHandler = require(path.join(rootDirectoryStr, 'utils', 'errorHandlers', 'errorHandler.js'));
 const multerOpts = require(path.join(rootDirectoryStr, 'utils', 'multerOpts', 'multerOpts.js'));
-const sockets = require(path.join(rootDirectoryStr, 'utils', 'sockets', 'sockets.js'));
+const socket = require(path.join(rootDirectoryStr, 'utils', 'sockets', 'socket.js'));
 
 const authRoutes = require(path.join(rootDirectoryStr, 'routes', 'authRoutes.js'));
 const userRoutes = require(path.join(rootDirectoryStr, 'routes', 'userRoutes.js'));
@@ -35,5 +35,6 @@ const server = http.createServer(app);
 mongoose.connect(connectionStr)
 .then(res => {
     const activeServer = server.listen(8080);
-    sockets.addSocket(activeServer);
+    socket.initialize(activeServer);
+    socket.addSocket();
 });
