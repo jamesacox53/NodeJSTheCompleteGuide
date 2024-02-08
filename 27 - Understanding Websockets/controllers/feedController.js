@@ -61,6 +61,7 @@ exports.getPosts = (request, response, next) => {
 
         return Post.find()
         .populate('creator')
+        .sort({ createdAt: -1 })
         .skip((page - 1) * ITEMS_PER_PAGE)
         .limit(ITEMS_PER_PAGE)
         .then(postsArr => _sendResponse(postsArr, totalNumPosts))
