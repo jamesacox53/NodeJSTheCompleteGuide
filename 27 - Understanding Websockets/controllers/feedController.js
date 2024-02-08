@@ -264,6 +264,14 @@ exports.putEditPost = (request, response, next) => {
         if (newImageURL !== oldImageURL)
             _deleteFile(oldImageURL);
 
+        const io = socket.getIO();
+        const socketPayloadObj = {
+            action: 'updatePost',
+            post: editedPost
+        };
+    
+        io.emit('posts', socketPayloadObj);
+
         return response.status(200).json({
             message: 'Post successfully updated.',
             post: editedPost
@@ -331,7 +339,7 @@ exports.deletePost = (request, response, next) => {
         return Post.deleteOne({ _id: post._id })
         .then(err => User.findById(creatorID))
         .then(user => _removePostFromCreator(user, postID))
-        .then(err => _cleanUpFilesAndSendResponse(imageURL))
+        .then(err => _cleanUpFilesAndSendResponse(imageURL, postID))
         .catch(err => _handleError(err));
     }
 
@@ -341,8 +349,16 @@ exports.deletePost = (request, response, next) => {
         return user.save();
     }
 
-    function _cleanUpFilesAndSendResponse(imageURL) {
+    function _cleanUpFilesAndSendResponse(imageURL, postID) {
         _deleteFile(imageURL);
+
+        const io = socket.getIO();
+        const socketPayloadObj = {
+            action: 'delete',
+            postID: postID
+        };
+
+        io.emit('posts', socketPayloadObj);
 
         return response.status(200).json({
             message: 'Post successfully deleted.'
