@@ -60,6 +60,7 @@ exports.getPosts = (request, response, next) => {
         const page = controllerUtils.getPageNum(request, ITEMS_PER_PAGE, totalNumPosts);
 
         return Post.find()
+        .populate('creator')
         .skip((page - 1) * ITEMS_PER_PAGE)
         .limit(ITEMS_PER_PAGE)
         .then(postsArr => _sendResponse(postsArr, totalNumPosts))
@@ -145,11 +146,8 @@ exports.createPost = (request, response, next) => {
 
     function _sendResponse(user, post) {
         const io = socket.getIO();
-        const socketPayloadObj = {
-            action: 'create',
-            post: post
-        };
-        
+        const socketPayloadObj = _createSocketPayloadObj(user, post);
+
         io.emit('posts', socketPayloadObj);
 
         return response.status(201).json({
@@ -158,6 +156,22 @@ exports.createPost = (request, response, next) => {
             userId: user._id.toString(),
             userName: user.name.toString()
         });
+    }
+
+    function _createSocketPayloadObj(user, post) {
+        const socketPayloadObj = {
+            action: 'create',
+            post: {
+                ...post._doc,
+            },
+        };
+
+        socketPayloadObj.post.creator = {
+            _id: user._id.toString(),
+            userName: user.name.toString()
+        };
+
+        return socketPayloadObj;
     }
 
     function _handleError(err) {
