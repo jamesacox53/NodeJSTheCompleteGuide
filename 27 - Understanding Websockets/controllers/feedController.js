@@ -204,7 +204,7 @@ exports.putEditPost = (request, response, next) => {
     function _editPost() {
         const postID = request.params.postID;
         
-        return Post.findById(postID)
+        return Post.findById(postID).populate('creator')
         .then(post => _checkPostAndEdit(post, postID))
         .catch(err => _handleError(err));
     }
@@ -217,7 +217,7 @@ exports.putEditPost = (request, response, next) => {
             throw error;
         }
 
-        const creatorID = post.creator.toString();
+        const creatorID = post.creator._id.toString();
         const userID = request.userID.toString();
 
         if (creatorID !== userID) {
