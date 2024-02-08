@@ -13,14 +13,5 @@ function getIO() {
     return io;
 }
 
-function addSocket() {
-    io.on('connection', socket => _onConnection(socket));
-}
-
-function _onConnection(socket) {
-    console.log('Client connected');
-}
-
 exports.initialize = initialize;
 exports.getIO = getIO;
-exports.addSocket = addSocket;

@@ -5,6 +5,7 @@ const { validationResult } = require('express-validator');
 const Post = require(path.join('..', 'models', 'post.js'));
 const User = require(path.join('..', 'models', 'user.js'));
 const controllerUtils = require(path.join('..', 'utils', 'controllerUtils', 'controllerUtils.js'));
+const socket = require(path.join('..', 'utils', 'sockets', 'socket.js'));
 
 const ITEMS_PER_PAGE = 2;
 
@@ -143,6 +144,14 @@ exports.createPost = (request, response, next) => {
     }
 
     function _sendResponse(user, post) {
+        const io = socket.getIO();
+        const socketPayloadObj = {
+            action: 'create',
+            post: post
+        };
+        
+        io.emit('posts', socketPayloadObj);
+
         return response.status(201).json({
             message: 'Post created successfully!',
             post: post,

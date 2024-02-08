@@ -36,5 +36,4 @@ mongoose.connect(connectionStr)
 .then(res => {
     const activeServer = server.listen(8080);
     socket.initialize(activeServer);
-    socket.addSocket();
 });
