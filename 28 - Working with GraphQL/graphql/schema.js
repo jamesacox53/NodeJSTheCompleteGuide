@@ -1,6 +1,15 @@
 const { buildSchema } = require('graphql');
 
 module.exports = buildSchema(`
+    type TestData {
+        text: String!
+        views: Int!
+    }
+
+    type RootQuery {
+        hello: TestData!
+    }
+
     type Post {
         _id: ID!
         title: String!
@@ -31,5 +40,6 @@ module.exports = buildSchema(`
 
     schema {
         mutation: RootMutation
+        query: RootQuery
     }
 `);

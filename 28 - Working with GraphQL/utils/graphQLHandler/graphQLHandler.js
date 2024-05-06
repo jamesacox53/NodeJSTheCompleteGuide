@@ -8,5 +8,5 @@ const root = require(path.join(rootDirectoryStr, 'graphQL', 'resolvers.js'));
 
 module.exports = createHandler({
     schema: schema,
-    rootValue: root 
+    rootValue: root
 });
