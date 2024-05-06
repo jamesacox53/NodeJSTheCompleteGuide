@@ -70,19 +70,18 @@ module.exports = {
         return _login(args);
 
         async function _login(args) {
-            const userInput = args.userInput;
-            const user = await User.findOne({ email: userInput.email });
-        
+            const user = await User.findOne({ email: args.email });
+            
             if (!user) {
                 const error = new Error("User doesn't exists");
                 throw error;
             }
 
-            return _loginUser(userInput, user);
+            return _loginUser(args, user);
         }
 
-        async function _loginUser(userInput, user) {
-            const isEqual = await bcrypt.compare(userInput.password, user.password);
+        async function _loginUser(args, user) {
+            const isEqual = await bcrypt.compare(args.password, user.password);
             if (!isEqual)
                 throw new Error('Password is incorrect.');
 
