@@ -1,8 +1,10 @@
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
+const jwt = require('jsonwebtoken');
 
 const User = require(path.join('..', 'models', 'user.js'));
+const jwtSecretStr = require(path.join('..', 'sensitive', 'jsonWebTokenSecretStr.js'));
 
 module.exports = {
     hello() {
@@ -61,6 +63,35 @@ module.exports = {
                 ...createdUser._doc,
                 _id: createdUser._id.toString()
             };
+        }
+    },
+
+    login: async function(args) {
+        return _login(args);
+
+        async function _login(args) {
+            const userInput = args.userInput;
+            const user = await User.findOne({ email: userInput.email });
+        
+            if (!user) {
+                const error = new Error("User doesn't exists");
+                throw error;
+            }
+
+            return _loginUser(userInput, user);
+        }
+
+        async function _loginUser(userInput, user) {
+            const isEqual = await bcrypt.compare(userInput.password, user.password);
+            if (!isEqual)
+                throw new Error('Password is incorrect.');
+
+            const token = jwt.sign({
+                userId: user._id.toString(),
+                email: user.email,
+            }, jwtSecretStr, { expiresIn: '1hr' });
+
+            return { token: token, userID: user._id.toString() };
         }
     }
 }
