@@ -1,5 +1,6 @@
 const path = require('path');
 const bcrypt = require('bcryptjs');
+const validator = require('validator');
 
 const User = require(path.join('..', 'models', 'user.js'));
 
@@ -15,6 +16,8 @@ module.exports = {
         return _createUser(args);
 
         async function _createUser(args) {
+            _validateArgs(args);
+
             const userInput = args.userInput;
             const existingUser = await User.findOne({ email: userInput.email });
         
@@ -24,6 +27,22 @@ module.exports = {
             }
 
             return _createNewUser(userInput);
+        }
+
+        function _validateArgs(args) {
+            if (!args)
+                throw new Error('No args object.');
+
+            const userInput = args.userInput;
+            if (!userInput)
+                throw new Error('No userInput object.');
+            
+            if (!validator.isEmail(userInput.email))
+                throw new Error("Email isn't valid");
+
+            if (validator.isEmpty(userInput.password) ||
+                validator.isLength(userInput.password, { min: 5 }))
+                throw new Error("Password isn't valid.");
         }
 
         async function _createNewUser(userInput) {
