@@ -41,7 +41,7 @@ module.exports = {
                 throw new Error("Email isn't valid");
 
             if (validator.isEmpty(userInput.password) ||
-                validator.isLength(userInput.password, { min: 5 }))
+                !validator.isLength(userInput.password, { min: 5 }))
                 throw new Error("Password isn't valid.");
         }
 
