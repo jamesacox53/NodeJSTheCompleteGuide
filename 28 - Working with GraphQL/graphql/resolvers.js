@@ -95,22 +95,27 @@ module.exports = {
         }
     },
 
-    createPost: async function(args) {
-        return _createPost(args);
+    createPost: async function(args, req) {
+        return _createPost(args, req);
 
-        async function _createPost(args) {
-            _validateArgs(args);
+        async function _createPost(args, req) {
+            _validateInput(args, req);
 
             const postInput = args.postInput;
+
+            const user = await User.findById(req.userID);
+            if (!user)
+                throw new Error('Invalid User');
 
             const post = new Post({
                 title: postInput.title,
                 content: postInput.content,
-                imageURL: postInput.imageURL
+                imageURL: postInput.imageURL,
+                creator: user
             });
 
             const createdPost = await post.save();
-            // Add post to users' post
+            user.posts.push(createdPost);
 
             return { 
                 ...createdPost._doc,
@@ -120,7 +125,7 @@ module.exports = {
             };
         }
 
-        function _validateArgs(args) {
+        function _validateInput(args, req) {
             if (!args)
                 throw new Error('No args object.');
 
@@ -135,6 +140,10 @@ module.exports = {
             if (validator.isEmpty(postInput.content) ||
                 !validator.isLength(postInput.content, { min: 5 }))
                 throw new Error("Content isn't valid.");
+
+            if (!req.isAuth) {
+                throw new Error("Not Authenticated");
+            }
         }
     }
 }
