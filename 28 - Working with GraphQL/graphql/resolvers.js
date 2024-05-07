@@ -4,6 +4,7 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken');
 
 const User = require(path.join('..', 'models', 'user.js'));
+const Post = require(path.join('..', 'models', 'post.js'));
 const jwtSecretStr = require(path.join('..', 'sensitive', 'jsonWebTokenSecretStr.js'));
 
 module.exports = {
@@ -91,6 +92,49 @@ module.exports = {
             }, jwtSecretStr, { expiresIn: '1hr' });
 
             return { token: token, userID: user._id.toString() };
+        }
+    },
+
+    createPost: async function(args) {
+        return _createPost(args);
+
+        async function _createPost(args) {
+            _validateArgs(args);
+
+            const postInput = args.postInput;
+
+            const post = new Post({
+                title: postInput.title,
+                content: postInput.content,
+                imageURL: postInput.imageURL
+            });
+
+            const createdPost = await post.save();
+            // Add post to users' post
+
+            return { 
+                ...createdPost._doc,
+                _id: createdPost._id.toString(),
+                createdAt: createdPost.createdAt.toISOString(),
+                updatedAt: createdPost.updatedAt.toISOString()
+            };
+        }
+
+        function _validateArgs(args) {
+            if (!args)
+                throw new Error('No args object.');
+
+            const postInput = args.postInput;
+            if (!postInput)
+                throw new Error('No postInput object.');
+            
+            if (validator.isEmpty(postInput.title) ||
+            !validator.isLength(postInput.title, { min: 5 }))
+                throw new Error("Title isn't valid");
+
+            if (validator.isEmpty(postInput.content) ||
+                !validator.isLength(postInput.content, { min: 5 }))
+                throw new Error("Content isn't valid.");
         }
     }
 }
