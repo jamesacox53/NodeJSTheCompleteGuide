@@ -12,7 +12,7 @@ const connectionStr = require(path.join(rootDirectoryStr, 'sensitive', 'mongoose
 const corsHeaders = require(path.join(rootDirectoryStr, 'utils', 'middleware', 'corsHeaders.js'));
 const errorHandler = require(path.join(rootDirectoryStr, 'utils', 'errorHandlers', 'errorHandler.js'));
 const multerOpts = require(path.join(rootDirectoryStr, 'utils', 'multerOpts', 'multerOpts.js'));
-const graphQLOpts = require(path.join(rootDirectoryStr, 'utils', 'graphQLHandler', 'graphQLHandler.js'));
+const graphQLHandler = require(path.join(rootDirectoryStr, 'utils', 'graphQLHandler', 'graphQLHandler.js'));
 const auth = require(path.join(rootDirectoryStr, 'utils', 'middleware', 'auth.js'));
 
 const fileStorage = multer.diskStorage(multerOpts.fileStorageObj);
@@ -23,7 +23,7 @@ app.use(multer({ storage: fileStorage, fileFilter: multerOpts.fileFilterFunc }).
 app.use('images', express.static(path.join(rootDirectoryStr, 'images')));
 app.use(corsHeaders);
 app.use(auth);
-app.all("/graphql", graphQLOpts);
+app.all("/graphql", graphQLHandler);
 
 // Serve the GraphiQL IDE.
 app.get("/", (_req, res) => {

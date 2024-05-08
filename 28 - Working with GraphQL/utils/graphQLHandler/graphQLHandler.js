@@ -8,5 +8,9 @@ const root = require(path.join(rootDirectoryStr, 'graphQL', 'resolvers.js'));
 
 module.exports = createHandler({
     schema: schema,
-    rootValue: root
+    rootValue: root,
+    context: (req) => ({
+        userID: req.raw.userID,
+        isAuth: req.raw.isAuth
+      })
 });
