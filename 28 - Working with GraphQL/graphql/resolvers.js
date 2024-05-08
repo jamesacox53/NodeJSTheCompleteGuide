@@ -146,5 +146,35 @@ module.exports = {
                 throw new Error("Not Authenticated");
             }
         }
+    },
+
+    posts: async function(args, req)  {
+        _validateInput(args, req);
+        
+        const totalPosts = await Post.find().countDocuments();
+        const posts = await Post.find()
+            .sort({createdAt: -1})
+            .populate('creator');
+        
+        return {
+            posts: posts.map(p => {
+                return {
+                    ...p._doc,
+                    _id: p._id.toString(),
+                    createdAt: p.createdAt.toISOString(),
+                    updatedAt: p.updatedAt.toISOString()
+                }
+            }),
+            totalPosts: totalPosts
+        };
+
+        function _validateInput(args, req) {
+            if (!args)
+                throw new Error('No args object.');
+
+            if (!req.isAuth) {
+                throw new Error("Not Authenticated");
+            }
+        }
     }
 }
