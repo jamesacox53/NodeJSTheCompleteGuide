@@ -199,5 +199,53 @@ module.exports = {
             createdAt: post.createdAt.toISOString(),
             updatedAt: post.updatedAt.toISOString()
         }
+    },
+
+    updatePost: async function(args, req) {
+        _validateInput(args, req);
+
+        const post = await Post.findById(args.id).populate('creator');
+        if (!post)
+            throw new Error('No post found');
+
+        if (post.creator._id.toString() !== req.userID.toString())
+            throw new Error('Not authorized')
+
+        const postInput = args.postInput;
+
+        post.title = postInput.title;
+        post.content = postInput.content;
+        if (postInput.imageURL !== 'undefined')
+            post.imageURL = postInput.imageURL;
+
+        const updatePost = await post.save();
+
+        return {
+            ...updatePost._doc,
+            _id: updatePost._id.toString(),
+            createdAt: updatePost.createdAt.toISOString(),
+            updatedAt: updatePost.updatedAt.toISOString()
+        }
+        
+        function _validateInput(args, req) {
+            if (!args)
+                throw new Error('No args object.');
+
+            const postInput = args.postInput;
+            if (!postInput)
+                throw new Error('No postInput object.');
+            
+            if (validator.isEmpty(postInput.title) ||
+            !validator.isLength(postInput.title, { min: 5 }))
+                throw new Error("Title isn't valid");
+
+            if (validator.isEmpty(postInput.content) ||
+                !validator.isLength(postInput.content, { min: 5 }))
+                throw new Error("Content isn't valid.");
+
+            if (!req.isAuth) {
+                throw new Error("Not Authenticated");
+            }
+        }
     }
 }
