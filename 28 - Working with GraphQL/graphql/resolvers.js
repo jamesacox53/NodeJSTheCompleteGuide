@@ -182,5 +182,22 @@ module.exports = {
                 throw new Error("Not Authenticated");
             }
         }
+    },
+
+    post: async function({ id }, req) {
+        if (!req.isAuth) {
+            throw new Error("Not Authenticated");
+        }
+
+        const post = await Post.findById(id).populate('creator');
+        if (!post)
+            throw new Error('No post found');
+        
+        return {
+            ...post._doc,
+            _id: post._id.toString(),
+            createdAt: post.createdAt.toISOString(),
+            updatedAt: post.updatedAt.toISOString()
+        }
     }
 }
