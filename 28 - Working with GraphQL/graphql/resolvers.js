@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const User = require(path.join('..', 'models', 'user.js'));
 const Post = require(path.join('..', 'models', 'post.js'));
 const jwtSecretStr = require(path.join('..', 'sensitive', 'jsonWebTokenSecretStr.js'));
+const { clearImage } = require(path.join('..', 'utils', 'fileUtils', 'file.js'));
 
 module.exports = {
     hello() {
@@ -247,5 +248,27 @@ module.exports = {
                 throw new Error("Not Authenticated");
             }
         }
-    }
+    },
+
+    deletePost: async function({ id }, req) {
+        if (!req.isAuth) {
+            throw new Error("Not Authenticated");
+        }
+
+        const post = await Post.findById(id);
+        if (!post)
+            throw new Error('No post found');
+
+        if (post.creator.toString() !== req.userID.toString())
+            throw new Error('Not authorized')
+
+        clearImage(post.imageURL);
+        await Post.deleteOne({ _id: id });
+
+        const user = await User.findById(req.userID);
+        user.posts.pull(id);
+        await user.save();
+
+        return true;
+    },
 }

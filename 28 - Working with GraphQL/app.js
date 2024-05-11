@@ -1,5 +1,4 @@
 const path = require('path');
-const fs = require('fs');
 const http = require('http');
 
 const express = require('express');
@@ -15,6 +14,7 @@ const errorHandler = require(path.join(rootDirectoryStr, 'utils', 'errorHandlers
 const multerOpts = require(path.join(rootDirectoryStr, 'utils', 'multerOpts', 'multerOpts.js'));
 const graphQLHandler = require(path.join(rootDirectoryStr, 'utils', 'graphQLHandler', 'graphQLHandler.js'));
 const auth = require(path.join(rootDirectoryStr, 'utils', 'middleware', 'auth.js'));
+const { clearImage } = require(path.join(rootDirectoryStr, 'utils', 'fileUtils', 'file.js'));
 
 const fileStorage = multer.diskStorage(multerOpts.fileStorageObj);
 
@@ -36,11 +36,6 @@ app.put('/post-image', (req, res, next) => {
     clearImage(req.body.oldPath)  
 
   return res.status(201).json({ message: 'File stored.', filePath: req.file.path });
-
-  function clearImage(filePath) {
-    // filePath = path.join(__dirname, '..', filePath);
-    fs.unlink(filePath, err => console.log(err));
-  }
 });
 
 app.all("/graphql", graphQLHandler);
