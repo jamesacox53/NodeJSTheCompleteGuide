@@ -1,0 +1,39 @@
+<%- include(path.join('..', 'includes', 'head.ejs')) %>
+    </head>
+
+    <body>
+        <%- include(path.join('..', 'includes', 'navigation.ejs')) %>
+        <% if (cart.items.length > 0) { %>    
+            <ul>
+                <% for (productObj of cart.items) { %>
+                    <li>
+                        <p><%= productObj.productID.title %> (<%= productObj.quantity %>)</p>
+                        <p><%= productObj.productID.price %> x <%= productObj.quantity %> = <%= productObj.productID.price * productObj.quantity %></p>
+                    </li>
+                <% } %>
+            </ul>
+            <div class="centered">Total: <%= totalPrice %></div>
+            <hr>
+            <div class="centered">
+                <!-- <form action="/create-order" method="POST">
+                    <input type="hidden" name="CSRFToken" value="<%= crsfToken %>">
+                    <button type="submit" class="btn">Order Now</button>
+                </form> -->
+                <div class="centered">
+                    <button id="order-btn" class="btn">ORDER</button>
+                    <script src="https://js.stripe.com/v3/"></script>
+                    <script>
+                        var stripe = Stripe('pk_test_51OdG9wBBJSK93if3K9A1Y68MGkBHD4wxzk3oRUxMY65y2matBEvESGhwIboZsvLR4rRLhZcUbClsE1SPksPnQIBb00r249cPdT');
+                        var orderBtn = document.getElementById('order-btn');
+                        orderBtn.addEventListener('click', function() {
+                            stripe.redirectToCheckout({
+                                sessionId: '<%= sessionID %>'
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+        <% } else { %>
+            <h1>No Products</h1>
+        <% } %>    
+        <%- include(path.join('..', 'includes', 'end.ejs')) %>

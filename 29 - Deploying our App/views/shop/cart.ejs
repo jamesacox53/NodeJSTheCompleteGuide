@@ -1,0 +1,30 @@
+<%- include(path.join('..', 'includes', 'head.ejs')) %>
+    </head>
+
+    <body>
+        <%- include(path.join('..', 'includes', 'navigation.ejs')) %>
+        <% if (cart.items.length > 0) { %>    
+            <ul>
+                <% for (productObj of cart.items) { %>
+                    <li>
+                        <p><%= productObj.productID.title %> (<%= productObj.quantity %>)</p>
+                        <form action="/cart-delete-item" method="POST">
+                            <input type="hidden" name="productID" value="<%= productObj.productID._id %>">
+                            <input type="hidden" name="CSRFToken" value="<%= crsfToken %>">
+                            <button class="btn" type="submit">Delete</button>
+                        </form>
+                    </li>
+                <% } %>    
+            </ul>
+            <hr>
+            <div class="centered">
+                <a class="btn" href="/checkout">Order Now!</a>
+                <!-- <form action="/create-order" method="POST">
+                    <input type="hidden" name="CSRFToken" value="<%= crsfToken %>">
+                    <button type="submit" class="btn">Order Now</button>
+                </form> -->
+            </div>
+        <% } else { %>
+            <h1>No Products</h1>
+        <% } %>    
+        <%- include(path.join('..', 'includes', 'end.ejs')) %>
