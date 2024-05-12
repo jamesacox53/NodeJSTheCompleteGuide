@@ -1,4 +1,5 @@
 # Custom
+.env
 mySqlDatabaseCreds.js
 mongoDBCreds.js
 mongooseDBCreds.js

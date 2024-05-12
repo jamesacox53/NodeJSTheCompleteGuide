@@ -1,3 +1,4 @@
+require('dotenv').config()
 // Core
 const http = require('http');
 const path = require('path');
@@ -54,4 +55,4 @@ errorHandler.addErrorHandlers(app);
 const server = http.createServer(app);
 
 mongoose.connect(connectionStr)
-.then(res => server.listen(3000));
+.then(res => server.listen(process.env.PORT));
