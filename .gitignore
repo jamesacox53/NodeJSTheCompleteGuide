@@ -1,4 +1,5 @@
 # Custom
+server.key
 .env
 mySqlDatabaseCreds.js
 mongoDBCreds.js
