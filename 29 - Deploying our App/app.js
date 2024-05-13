@@ -2,6 +2,7 @@ require('dotenv').config()
 // Core
 const http = require('http');
 const path = require('path');
+const fs = require('fs');
 
 // 3rd Party
 const express = require('express');
@@ -12,6 +13,7 @@ const connectFlash = require('connect-flash');
 const multer = require('multer');
 const helmet = require('helmet');
 const compression = require('compression');
+const morgan = require('morgan');
 
 const rootDirectoryStr = path.dirname(require.main.filename);
 const connectionStr = require(path.join(rootDirectoryStr, 'sensitive', 'mongooseDBConnectionStr.js'));
@@ -28,6 +30,7 @@ const shopRoutes = require(path.join(rootDirectoryStr, 'routes', 'shopRoutes.js'
 const errorRoutes = require(path.join(rootDirectoryStr, 'routes', 'errorRoutes.js'));
 
 const errorHandler = require(path.join(rootDirectoryStr, 'errorHandlers', 'errorHandler.js'));
+const accessLogStream = fs.createReadStream(path.join(rootDirectoryStr, 'logs', 'access.log'), { flags: 'a' });
 
 const fileStorage = multer.diskStorage(multerOpts.fileStorageObj);
 const { csrfSynchronisedProtection } = csrfSync(csrfSyncOptionsObj);
@@ -38,6 +41,7 @@ app.set('views', 'views');
 
 app.use(helmet());
 app.use(compression());
+app.use(morgan('combined', { stream: accessLogStream }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({ storage: fileStorage, fileFilter: multerOpts.fileFilterFunc }).single('image'));
 app.use(express.static(path.join(rootDirectoryStr, 'public')));
