@@ -11,6 +11,7 @@ const { csrfSync } = require('csrf-sync');
 const connectFlash = require('connect-flash');
 const multer = require('multer');
 const helmet = require('helmet');
+const compression = require('compression');
 
 const rootDirectoryStr = path.dirname(require.main.filename);
 const connectionStr = require(path.join(rootDirectoryStr, 'sensitive', 'mongooseDBConnectionStr.js'));
@@ -36,6 +37,7 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 app.use(helmet());
+app.use(compression());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({ storage: fileStorage, fileFilter: multerOpts.fileFilterFunc }).single('image'));
 app.use(express.static(path.join(rootDirectoryStr, 'public')));
