@@ -1,4 +1,7 @@
 import { expect } from 'chai';
+import jwt from 'jsonwebtoken';
+import sinon from 'sinon';
+
 import isAuth from '../utils/middleware/isAuth.js';
 
 describe('Auth Middleware', function() {
@@ -39,9 +42,14 @@ describe('Auth Middleware', function() {
             }
         };
         
-        isAuth(req, {}, () => {});
+        sinon.stub(jwt, 'verify');
+        jwt.verify.returns({ userId: 'abc' });
 
-        expect(req).to.have.property.userID;
+        isAuth(req, {}, () => {});
+        expect(req).to.have.property('userID');
+        expect(req).to.have.property('userID', 'abc');
+        expect(jwt.verify.called).to.be.true;
+        jwt.verify.restore();
     });
 });
 
