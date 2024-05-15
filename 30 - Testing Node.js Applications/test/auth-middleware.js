@@ -21,5 +21,27 @@ describe('Auth Middleware', function() {
     
         expect(isAuth.bind(this, req, {}, () => {})).to.throw("Authorization header should be in the format of 'Bearer jwtStr'.");
     });
+
+    it ('should throw an error if the token cannot be verified', function() {
+        const req = {
+            get: function() {
+                return 'Bearer xyz';
+            }
+        };
+    
+        expect(isAuth.bind(this, req, {}, () => {})).to.throw("jwt malformed");
+    });
+
+    it ('should yield a userID after decoding the token', function() {
+        const req = {
+            get: function() {
+                return 'Bearer xyz';
+            }
+        };
+        
+        isAuth(req, {}, () => {});
+
+        expect(req).to.have.property.userID;
+    });
 });
 
