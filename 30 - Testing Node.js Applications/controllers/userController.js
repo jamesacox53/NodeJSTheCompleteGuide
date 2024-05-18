@@ -3,7 +3,7 @@ import { validationResult } from 'express-validator';
 import User from '../models/user.js';
 
 const getStatus = (request, response, next) => {
-    _getStatus();
+    return _getStatus();
 
     function _getStatus() {
         const userID = request.params.userID;
