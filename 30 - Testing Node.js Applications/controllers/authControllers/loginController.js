@@ -6,7 +6,7 @@ import User from '../../models/user.js';
 import jsonWebTokenSecretStr from '../../sensitive/jsonWebTokenSecretStr.js';
 
 const postLogin = (request, response, next) => {
-    _postLogin();
+    return _postLogin();
 
     function _postLogin() {
         const errors = validationResult(request);
@@ -28,12 +28,26 @@ const postLogin = (request, response, next) => {
         emailStr: request.body.email,
         passwordStr: request.body.password
       };
-          
-      return User.findOne({ 'email': loginObj.emailStr })
+    
+      return _getUser(loginObj)
       .then(user => _loginUser(user, loginObj))
-      .catch(err => _handleError(err));
+      .catch(err => _handleError(err));  
     }
-      
+
+    // I did this, I'm not sure if it's correct
+    function _getUser(loginObj) {
+      return new Promise((resolve, reject) => {
+        try {
+          User.findOne({ 'email': loginObj.emailStr })
+          .then(user => resolve(user))
+          .catch(err => reject(err));
+
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }
+  
     function _loginUser(user, loginObj) {
       if (!user) {
         return response.status(401).json({

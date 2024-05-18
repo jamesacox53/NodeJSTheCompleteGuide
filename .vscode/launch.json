@@ -12,7 +12,7 @@
             "type": "node-terminal",
             "name": "Run Script: start",
             "request": "launch",
-            "command": "npm run start",
+            "command": "npm start",
             "cwd": "${workspaceFolder}\\30 - Testing Node.js Applications"
         }
     ]
