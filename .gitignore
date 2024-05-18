@@ -1,4 +1,5 @@
 # Custom
+mongooseTestDBConnectionStr.js
 server.key
 .env
 mySqlDatabaseCreds.js
