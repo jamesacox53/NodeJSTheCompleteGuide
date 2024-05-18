@@ -12,19 +12,14 @@ describe('User Controller', function() {
     it('should send a response with a valid user status for an existing user', function(done) {
         mongoose.connect(mongooseTestDBConnectionStr)
         .then(res => {
-            return User.findById('5c0f66b979af55031b34728a')
-            .then(user => {
-                if (user) return user;
-
-                return new User({
-                    _id: '5c0f66b979af55031b34728a',
-                    email: 'test@test.com',
-                    password: 'testertester',
-                    name: 'Test',
-                    status: 'Test Status',
-                    post: []
-                }).save();
-            });
+            return new User({
+                _id: '5c0f66b979af55031b34728a',
+                email: 'test@test.com',
+                password: 'testertester',
+                name: 'Test',
+                status: 'Test Status',
+                post: []
+            }).save();
         })
         .then(() => {
             const req = { 
@@ -48,8 +43,9 @@ describe('User Controller', function() {
             UserController.getStatus(req, res, () => {}).then(() => {
                 expect(res.statusCode).to.be.equal(200);
                 expect(res.userStatus).to.be.equal('Test Status');
-
-                done();
+                User.deleteMany({})
+                .then(() => mongoose.disconnect())
+                .then(() => done());
             });
         })
         .catch(err => console.log(err));
