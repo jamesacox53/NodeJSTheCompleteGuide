@@ -7,6 +7,7 @@ import mongooseTestDBConnectionStr from '../sensitive/mongooseTestDBConnectionSt
 import FeedController from '../controllers/feedController.js';
 
 import User from '../models/user.js';
+import Post from '../models/post.js';
 
 describe('Feed Controller', function() {
     before(function(done) {
@@ -55,6 +56,7 @@ describe('Feed Controller', function() {
 
     after(function(done) {
         User.deleteMany({})
+        .then(() => Post.deleteMany({}))
         .then(() => mongoose.disconnect())
         .then(() => done());
     });
