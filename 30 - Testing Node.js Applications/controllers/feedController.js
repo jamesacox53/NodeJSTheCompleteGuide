@@ -80,7 +80,7 @@ const getPosts = (request, response, next) => {
 };
 
 const createPost = (request, response, next) => {
-    _validateAndCreatePost();
+    return _validateAndCreatePost();
     
     function _validateAndCreatePost() {
         const errors = validationResult(request);
@@ -142,12 +142,14 @@ const createPost = (request, response, next) => {
     }
 
     function _sendResponse(user, post) {
-        return response.status(201).json({
+        response.status(201).json({
             message: 'Post created successfully!',
             post: post,
             userId: user._id.toString(),
             userName: user.name.toString()
         });
+
+        return user;
     }
 
     function _handleError(err) {
