@@ -4,6 +4,7 @@ const num2Elem = document.getElementById('num2');
 const buttonElem = document.querySelector('button');
 const numResults = [];
 const textResults = [];
+;
 function myAdd(num1, num2) {
     if (typeof num1 === 'number' && typeof num2 === 'number') {
         return num1 + num2;
