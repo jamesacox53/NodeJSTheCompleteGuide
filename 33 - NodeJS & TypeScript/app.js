@@ -30,5 +30,11 @@ buttonElem.addEventListener('click', () => {
     console.log(printResult({ val: res, timestamp: new Date() }));
     console.log(numResults, textResults);
 });
+const myPromise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        resolve('It worked!');
+    }, 1000);
+});
+myPromise.then(res => console.log(res.split(' ')));
 console.log(myAdd(1, 6));
 console.log(myAdd('1', '6'));

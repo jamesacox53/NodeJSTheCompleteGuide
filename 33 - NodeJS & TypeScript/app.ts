@@ -3,7 +3,7 @@ const num2Elem = document.getElementById('num2') as HTMLInputElement;
 const buttonElem = document.querySelector('button')!;
 
 const numResults: number[] = [];
-const textResults: string[] = [];
+const textResults: Array<string> = [];
 
 type NumORString = number | string;
 type Result = { val: number; timestamp: Date };
@@ -43,6 +43,14 @@ buttonElem.addEventListener('click', () => {
     console.log(printResult({ val: res as number, timestamp: new Date() }));
     console.log(numResults, textResults);
 });
+
+const myPromise = new Promise<string>((resolve, reject) => {
+    setTimeout(() => {
+        resolve('It worked!');
+    }, 1000);
+});
+
+myPromise.then(res => console.log(res.split(' ')));
 
 console.log(myAdd(1, 6));
 console.log(myAdd('1', '6'));
