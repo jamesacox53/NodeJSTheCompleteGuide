@@ -1,4 +1,5 @@
 # Custom
+.deno_plugins/
 mongoDBCreds.ts
 mongooseTestDBConnectionStr.js
 server.key
