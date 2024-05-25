@@ -1,4 +1,5 @@
 # Custom
+mongoDBCreds.ts
 mongooseTestDBConnectionStr.js
 server.key
 .env
